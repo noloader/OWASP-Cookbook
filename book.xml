@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <title>Using OWASP Security Controls</title>
+  <subtitle>The Unofficial Cookbook</subtitle>
+  <bookinfo>
+    <edition>1</edition>
+    <authorgroup>
+      <!--
+      <author>
+        <firstname>Jim</firstname>
+        <surname>Manico</surname>
+      </author>
+      -->
+      <author>
+        <firstname>Omair</firstname>
+        <surname>Manzoor</surname>
+      </author>
+      <author>
+        <firstname>Kevin</firstname>
+        <surname>Wall</surname>
+      </author>
+      <author>
+        <firstname>Jeffrey</firstname>
+        <surname>Walton</surname>
+      </author>
+    </authorgroup>
+    <!--
+    <othercredit>
+      <firstname>John</firstname>
+      <surname>Doe</surname>
+      <contrib>Extensive review and rough drafts</contrib>
+    </othercredit>
+-->
+    <edition>Version 1.0 built using DocBook v4.5</edition>
+    <pubdate>
+      <!-- format is July 1, 2022 -->
+      <?dbtimestamp format="B d, Y"?>
+    </pubdate>
+  </bookinfo>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch01.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch02.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch03.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch04.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch05.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch06.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch07.xml"/>
+  <!--
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch08.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch09.xml"/>
+  -->
+  <!--
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="app01.xml"/>
+-->
+  <!--
+  Revision is still not quie rght....
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="ch09.xml"/>
+-->
+  <index/>
+</book>

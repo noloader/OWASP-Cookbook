@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch05_sql_inj">
+  <title>SQL Injection</title>
+  <para><indexterm><primary>SQL Injection</primary></indexterm>SQL Injection is the scourge of database programming. The vulnerability is a server-side injection attack and occurs when the attacker inserts malicious code into SQL query. This chapter of the book will show you how to use OWASP and ESAPI controls to protect against SQL vulnerabilities.</para>
+  <section id="sql_inj_documentation" xreflabel="PreparedStatement Documentation">
+    <title>Documentation</title>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Documentation</secondary></indexterm>Documentation for Java <systemitem>PreparedStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/index.html?java/sql/PreparedStatement.html">Interface PreparedStatement</ulink>.</para>
+  </section>
+  <section id="sql_inj_strategy">
+    <title>Strategy</title>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Parameterized Queries or Prepared Statements. Parameterized Queries and Prepared Statements keep code and data separate to ensure attacker supplied data is not interpreted as code by the underlying database engine.</para>
+    <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should use Parameterized Queries or Prepared Statements.</para>
+    <para>Encoding translates dangerous characters into a benign representations for storage in a database. The table below shows safe ways to encode dangerous characters.</para>
+    <table frame="all">
+      <title>Safe Encoding of Dangerous SQL Characters</title>
+      <tgroup cols="3" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="character" colwidth="1*"/>
+        <colspec colnum="2" colname="encoding" colwidth="1*"/>
+        <colspec colnum="3" colname="comment" colwidth="1*"/>
+        <thead>
+          <row>
+            <entry>Character</entry>
+            <entry>Encoding</entry>
+            <entry>Comment</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>' (single quote)</entry>
+            <entry>''</entry>
+            <entry>Single quote espaced with a single quote</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+</chapter>

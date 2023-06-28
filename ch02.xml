@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch02_input_validation">
+  <title>Input Validation</title>
+  <para><indexterm><primary>Validation</primary></indexterm>User input should be validated before your webapp consumes the data. This chapter of the book will show you how to use OWASP and ESAPI controls to assist in validating user data.</para>
+  <section id="input_validation" xreflabel="Input Validation">
+    <title>Input Validation</title>
+    <para><indexterm><primary>Input Validation</primary><secondary>Documentation</secondary></indexterm>Validating user input to ensure in conforms to a particular specification is a cornerstone to many developer tasks. A developer will encounter many forms of data, including names, numbers, social security numbers, credit card numbers, and dates. ESAPI provides the <systemitem>Validator</systemitem> class to help with the task.</para>
+  </section>
+  <section id="input_validation_documentation" xreflabel="Validator Documentation">
+    <title>Documentation</title>
+    <para><indexterm><primary>Input Validation</primary></indexterm>Documentation for ESAPI <systemitem>Validator</systemitem> class is located at <ulink url="https://www.javadoc.io/static/org.owasp.esapi/esapi/2.5.2.0/index.html?org/owasp/esapi/Validator.html">Interface Validator</ulink>.</para>
+  </section>
+</chapter>

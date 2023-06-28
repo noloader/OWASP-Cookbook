@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch03_output_contexts">
+  <title>Output Contexts</title>
+  <para><indexterm><primary>Output Contexts</primary></indexterm>The security controls used for vulnerable code depends on the output context. The controls used when building a web page will be different from the controls you use when storing data in a database. This chapter of the book will examine output contexts to understand how to remediate a potential vulnerability.</para>
+  <section id="output_contexts" xreflabel="Output Contexts">
+    <title>Output Contexts</title>
+    <para><indexterm><primary>Output Contexts</primary></indexterm>The example web app below accepts a user input, and upon clicking <systemitem>Submit</systemitem>, the client sends the input to the server for further processing. The question is, <emphasis>what controls or encoder should we use to handle the user's data</emphasis>?</para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/context_it_depends.svg" scalefit="1" width="35%" format="SVG" align="center"/>
+      </imageobject>
+    </mediaobject>
+    <para>The answer to the question is, <emphasis>it depends</emphasis>. It depends on the output context. Or put another way, it depends on how the user's input is used in an output.</para>
+    <para>The image below shows the dataflow from the client, to the server, and then to various output contexts. The webapp processes user data five different ways. First, it returns the data to the user in a confirmation webpage. Second, it stores the data in a SQL database. Third, it writes the data to a plaintext log file. Fourth, it prints a copy of the user data. And finally, the webapp sends a confirmation email with the user's data.</para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/context_possible_output.svg" scalefit="1" width="76%" format="SVG" align="center"/>
+      </imageobject>
+    </mediaobject>
+    <para>Now that we know the output contexts, we can answer the question, <emphasis>what controls or encoder should we use to handle the user's data</emphasis>?</para>
+    <para>The table below shows defense by output context.</para>
+    <table id="output_contexts_defense_by_context" xreflabel="Defense by Output Context" frame="all">
+      <title>Defense by Output Context</title>
+      <tgroup cols="2" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="context" colwidth="1*"/>
+        <colspec colnum="2" colname="defense" colwidth="2*"/>
+        <thead>
+          <row>
+            <entry>Context</entry>
+            <entry>Defense</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>HTML webpage</entry>
+            <entry>XSS encoding.</entry>
+          </row>
+          <row>
+            <entry>SQL database</entry>
+            <entry>Parameterized queries.</entry>
+          </row>
+          <row>
+            <entry>Application logging</entry>
+            <entry>Newline sanitization.</entry>
+          </row>
+          <row>
+            <entry>Line printer</entry>
+            <entry>None. Printing does not suffer injections.</entry>
+          </row>
+          <row>
+            <entry>Plaintext email</entry>
+            <entry>None. Plaintext email does not suffer injections.</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para>As <xref linkend="output_contexts_defense_by_context"/> shows, injections are remediated using one of several methods, depending on the output context. A HTML webpage returned to the user will use XSS encoding. (<xref linkend="xss_defense_by_context"/> provides more details, depending further on context). A SQL query or insertion will use Prepared Statements or Parameterized Queries. Application logging will use Newline sanitization. And two output contexts — the printer and plaintext email — do not require any remediations because they do not suffer from injection attacks.</para>
+    <para>The code shown below in <xref linkend="context_bad_code"/> <emphasis>will not</emphasis> work as expected. It is an incomplete remediation because it only addresses injections in the HTML body of the webpage returned to the user.</para>
+    <example id="context_bad_code">
+      <title>Incomplete Remediation</title>
+      <programlisting>Encoder encoder = ESAPI.encoder();
+String userText = encoder.encodeForHTML(
+                          request.getParameter("userText"));
+
+// userText returned in a response webpage. Safe for use.
+ConfirmUserText(userText);
+
+// userText stored in SQL database. Not safe for use.
+StoreUserText(userText);
+
+// userText logged to log file. Not safe for use.
+LogUserText(userText);
+
+// userText sent to printer. Who cares?
+PrintUserText(userText);
+
+// userText sent in plaintext email. Who cares?
+EmailUserText(userText);</programlisting>
+    </example>
+    <para>The code shown below in <xref linkend="context_good_code"/> <emphasis>will</emphasis> work as expected. It is a complete remediation because it addresses injections in all the output contexts, and not just the context of the web page returned to the user.</para>
+    <example id="context_good_code">
+      <title>Complete Remediation</title>
+      <programlisting>String userText = request.getParameter("userText");
+
+// userText returned in a response webpage. Safe for use.
+Encoder encoder = ESAPI.encoder();
+ConfirmUserText(encoder.encodeForHTML(userText));
+
+// userText stored in SQL database. Safe for use.
+StoreUserTextWithPreparedStatement(userText);
+
+// userText logged to log file. Safe for use.
+String scrubbedUserText = userText.replace('\n', '_')
+                                  .replace('\r', '_')
+                                  .replace("U+000D", "_")
+                                  .replace("U+000A", "_");
+LogUserText(scrubbedUserText);
+
+// userText sent to printer. Who cares?
+PrintUserText(userText);
+
+// userText sent in plaintext email. Who cares?
+EmailUserText(userText);</programlisting>
+    </example>
+  </section>
+</chapter>

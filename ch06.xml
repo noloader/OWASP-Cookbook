@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch06_ldap_inj">
+  <title>LDAP Injection</title>
+  <para><indexterm><primary>LDAP Injection</primary></indexterm>LDAP Injection is the scourge of directory programming. The vulnerability is a server-side injection attack and occurs when the attacker inserts malicious code into LDAP query. This chapter of the book will show you how to use OWASP and ESAPI controls to protect against LDAP vulnerabilities.</para>
+  <section id="ldap_inj_documentation" xreflabel="Encoder Documentation">
+    <title>Documentation</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>Documentation</secondary></indexterm>Documentation for ESAPI <systemitem>Encoder</systemitem> class is located at <ulink url="https://www.javadoc.io/static/org.owasp.esapi/esapi/2.5.2.0/index.html?org/owasp/esapi/Encoder.html">Interface Encoder</ulink>.</para>
+    <para>Documentation for the two RFCs used in this chapter are located at <ulink url="https://tools.ietf.org/html/rfc4514">RFC 4514, <emphasis>Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names</emphasis></ulink> and <ulink url="https://tools.ietf.org/html/rfc4515">RFC 4515, <emphasis>Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters</emphasis></ulink>.</para>
+    <para>An additional IETF document, <ulink url="https://tools.ietf.org/html/rfc4512">RFC 4512, <emphasis>Lightweight Directory Access Protocol (LDAP): Directory Information Models</emphasis></ulink>, is used to express the grammars provided in RFC 4514 and RFC 4515.</para>
+  </section>
+  <section id="ldap_inj_contexts">
+    <title>Contexts</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>Context</secondary></indexterm>When you program against the directory there are two different contexts you must be aware of. The contexts are LDAP Distinguished Names and LDAP Filter Strings. The context drives the encoder used, like <systemitem>encodeForDN</systemitem> and <systemitem>encodeForLDAP</systemitem>.</para>
+    <para>The first context is <emphasis>LDAP Distinguished Names</emphasis>, and it is used for LDAP distinguished names (DN). Encoding is specified in RFC 4514, <emphasis>Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names</emphasis>. RFC 4514 uses the characters from ranges 0x01-0x21, 0x23-0x2A, 0x2D-0x3A, 0x3D, 0x3F-0x5B, 0x5D-0x7F, and hex encode characters outside the ranges.</para>
+    <para>The second context is <emphasis>LDAP Filter Strings</emphasis>, and they are used when searching the directory. Encoding is specified in RFC 4515, <emphasis>Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters</emphasis>. RFC 4515 uses the characters from ranges 0x01-0x27, 0x2B-0x5B and 0x5D-0x7F, and hex encode characters outside the ranges.</para>
+    <para>It is possible to use a more restricted encoder for LDAP search filter strings. The restricted encoder could encode filter operators like  <systemitem>&amp;</systemitem>, <systemitem>|</systemitem>, <systemitem>:</systemitem>, <systemitem>!</systemitem> and <systemitem>~</systemitem>. An example of a more restricted filter encoder is shown below in <xref linkend="ldap_encodeForLDAPSearchFilter"/>.</para>
+  </section>
+  <section id="ldap_inj_strategy">
+    <title>Strategy</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against LDAP Injections in is encoding problematic characters. The characters to encode are context dependent as explained in <xref linkend="ldap_inj_contexts"/>.</para>
+    <para>For distinguished names, the characters are provided in the grammar shown in <ulink url="https://tools.ietf.org/html/rfc4514#section-3">RFC 4514, Section 3</ulink>. The table below shows the characters and how to encode them for the directory. Some characters fall under the "special" production rule, and they can be escaped with a slash. The remaining characters need hexadecimal encoding. ESAPI will use the special encoding for a character when available.</para>
+    <para><indexterm><primary>LUTF1</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>LUTF1</secondary></indexterm><indexterm><primary>SUTF1</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>SUTF1</secondary></indexterm><indexterm><primary>TUTF1</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>TUTF1</secondary></indexterm><systemitem>LUTF1</systemitem>, <systemitem>SUTF1</systemitem> and <systemitem>TUTF1</systemitem> are the subset of UTF-8 characters specified by RFC 4514 in leading (<systemitem>LUTF1</systemitem>), middle (<systemitem>SUTF1</systemitem>) and trailing (<systemitem>TUTF1</systemitem>) character positions. Distinctions are made between leading, middle stream and trailing characters like leading and trailing spaces. Leading and trailing spaces need to be escaped to preserve them in the distinguished name.</para>
+    <table frame="all" id="ldap_table_dn_chars">
+      <title>Encoding of LDAP Distinguished Name Characters</title>
+      <tgroup cols="4" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="character" colwidth="1.2*"/>
+        <colspec colnum="2" colname="encoding" colwidth="1*"/>
+        <colspec colnum="3" colname="special" colwidth="1*"/>
+        <colspec colnum="4" colname="comment" colwidth="3*"/>
+        <thead>
+          <row>
+            <entry>Character</entry>
+            <entry>Encoding</entry>
+            <entry>Special</entry>
+            <entry>Comment</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>NUL</entry>
+            <entry>\00</entry>
+            <entry>None</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>SPACE</entry>
+            <entry>\20</entry>
+            <entry>\SPACE</entry>
+            <entry>Not in LUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>"</entry>
+            <entry>\22</entry>
+            <entry>\"</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>#</entry>
+            <entry>\23</entry>
+            <entry>\#</entry>
+            <entry>Not in LUTF1</entry>
+          </row>
+          <row>
+            <entry>+</entry>
+            <entry>\2B</entry>
+            <entry>\+</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>,</entry>
+            <entry>\2C</entry>
+            <entry>\,</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>/</entry>
+            <entry>\2F</entry>
+            <entry>None</entry>
+            <entry>Required by Microsoft AD</entry>
+          </row>
+          <row>
+            <entry>;</entry>
+            <entry>\3B</entry>
+            <entry>\;</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>&lt;</entry>
+            <entry>\3C</entry>
+            <entry>\&lt;</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>=</entry>
+            <entry>\3D</entry>
+            <entry>\=</entry>
+            <entry>Optional, "special" production rule<footnote><para>The EQUAL character is allowed in <systemitem>LUTF1</systemitem>, <systemitem>SUTF1</systemitem> and <systemitem>TUTF1</systemitem>. However, the grammar has a production rule that allows EQUAL to have "special" encoding, too.</para></footnote></entry>
+          </row>
+          <row>
+            <entry>&gt;</entry>
+            <entry>\3E</entry>
+            <entry>\&gt;</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>ESC</entry>
+            <entry>\5C</entry>
+            <entry>\\</entry>
+            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+          </row>
+          <row>
+            <entry>0x80-0xFFFF</entry>
+            <entry>\hh</entry>
+            <entry>None</entry>
+            <entry>Hexadecimal encoded, 2 digits<footnote><para>The character is first converted to a UTF-8 multibyte sequence, then each byte is hexadecimal encoded.</para></footnote></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para>For search filter strings, the characters are provided in the grammar shown in <ulink url="https://tools.ietf.org/html/rfc4515#section-3">RFC 4515, Section 3</ulink>. The table below shows the characters and how to encode them for the directory. <indexterm><primary>UTF1SUBSET</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>UTF1SUBSET</secondary></indexterm><systemitem>UTF1SUBSET</systemitem> is the subset of UTF-8 characters specified by RFC 4515.</para>
+    <table frame="all" id="ldap_table_filter_chars">
+      <title>Encoding of LDAP Filter Characters</title>
+      <tgroup cols="3" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="character" colwidth="1*"/>
+        <colspec colnum="2" colname="encoding" colwidth="1*"/>
+        <colspec colnum="3" colname="comment" colwidth="2*"/>
+        <thead>
+          <row>
+            <entry>Character</entry>
+            <entry>Encoding</entry>
+            <entry>Comment</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>NUL</entry>
+            <entry>\00</entry>
+            <entry>Not in UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>!</entry>
+            <entry>\21</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>&amp;</entry>
+            <entry>\26</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>(</entry>
+            <entry>\28</entry>
+            <entry>Not in UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>)</entry>
+            <entry>\29</entry>
+            <entry>Not in UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>*</entry>
+            <entry>\2A</entry>
+            <entry>Not in UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>/</entry>
+            <entry>\2F</entry>
+            <entry>Required by Microsoft AD</entry>
+          </row>
+          <row>
+            <entry>:</entry>
+            <entry>\3A</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>&lt;</entry>
+            <entry>\3C</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>=</entry>
+            <entry>\3D</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>&gt;</entry>
+            <entry>\3E</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>ESC</entry>
+            <entry>\5C</entry>
+            <entry>Not in UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>|</entry>
+            <entry>\7C</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>~</entry>
+            <entry>\7E</entry>
+            <entry>Used in Filter grammar</entry>
+          </row>
+          <row>
+            <entry>0x80-0xFFFF</entry>
+            <entry>\hh</entry>
+            <entry>Hexadecimal encoded, 2 digits<footnote><para>The character is first converted to a UTF-8 multibyte sequence, then each byte is hexadecimal encoded.</para></footnote></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  <section id="ldap_distinguished_name">
+    <title>Distinguished Name</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>encodeForDN</secondary></indexterm><indexterm><primary>encodeForDN</primary></indexterm>The example below shows how to encode three relative distinguished names using ESAPI's <systemitem>encodeForDN</systemitem>. Recall the valid character ranges from RFC 4514 are 0x01-0x21, 0x23-0x2A, 0x2D-0x3A, 0x3D, 0x3F-0x5B, 0x5D-0x7F, and characters outside the ranges are hex encoded.</para>
+    <para>Note the code below encodes <systemitem>cn</systemitem>, <systemitem>dc2</systemitem> and <systemitem>dc1</systemitem> because the attacker controls the values. The code below does not encode <systemitem>distinguishedName</systemitem> because it is controlled by the program, and characters like <systemitem>"</systemitem>, <systemitem>#</systemitem>, <systemitem>+</systemitem>, <systemitem>;</systemitem>, <systemitem>&lt;</systemitem> and <systemitem>&gt;</systemitem> are control characters required by the processor.</para>
+    <example id="ldap_ex_distinguished_name_good">
+      <title>LDAP Distinguished Name, ESAPI Encoder</title>
+      <programlisting>Encoder encoder = ESAPI.encoder();
+String  cn = encoder.encodeForDN(request.getParameter("cn"));
+String dc2 = encoder.encodeForDN(request.getParameter("dc2"));
+String dc1 = encoder.encodeForDN(request.getParameter("dc1"));
+String distinguishedName = "CN=" + cn + ",DC=" + dc2 + ",DC=" + dc1;</programlisting>
+    </example>
+    <para>Running the code with Domain Component (DC) set to <systemitem>net</systemitem>, Domain Component (DC) set to <systemitem>example</systemitem> and Common Name (CN) set to <systemitem>James "Jim" Smith, III</systemitem> will result in an encoded distinguished name of <systemitem>CN=James \"Jim\" Smith\, III,DC=example,DC=net</systemitem>. Notice the quotes and comma in James Smith's name are escaped with a backslash.</para>
+    <para>Be certain to use <systemitem>encodeForDN</systemitem> on attacker controlled data, and not the entire distinguished name string. If you use <systemitem>encodeForDN</systemitem> on the entire distinguished name string, then the control characters will be encoded and modifications or updates on the object will fail. For example, the following code is incorrect, and <systemitem>distinguishedName</systemitem> will be ill-formed due to encoding control characters.</para>
+    <example id="ldap_ex_distinguished_name_bad">
+      <title>Incorrect LDAP Distinguished Name, ESAPI Encoder</title>
+      <programlisting>Encoder encoder = ESAPI.encoder();
+String  cn = request.getParameter("cn");
+String dc2 = request.getParameter("dc2");
+String dc1 = request.getParameter("dc1");
+String  dn = "CN=" + cn + ",DC=" + dc2 + ",DC=" + dc1;
+String distinguishedName = encoder.encodeForDN(dn);</programlisting>
+    </example>
+  </section>
+  <section id="ldap_search_filter">
+    <title>Search Filter</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>encodeForLDAP</secondary></indexterm><indexterm><primary>encodeForLDAP</primary></indexterm>The example below shows how to encode a search filter using ESAPI's <systemitem>encodeForLDAP</systemitem>. Recall the valid character ranges from RFC 4515 are 0x01-0x27, 0x2B-0x5B and 0x5D-0x7F, and characters outside the ranges are hex encoded.</para>
+    <para>Note the code below encodes <systemitem>cn</systemitem> because the attacker controls the value. The code below does not encode <systemitem>searchFilter</systemitem> because it is controlled by the program, and characters like <systemitem>(</systemitem>, <systemitem>)</systemitem>, <systemitem>=</systemitem> and <systemitem>&amp;</systemitem> are control characters required by the filter.</para>
+    <example id="ldap_ex_search_filter_esapi_good">
+      <title>LDAP Search Filter, ESAPI Encoder</title>
+      <programlisting>Encoder encoder = ESAPI.encoder();
+String cn = encoder.encodeForLDAP(request.getParameter("cn"));
+String searchFilter = "(&amp;(objectClass=user)(cn=" + cn + "))";</programlisting>
+    </example>
+    <para>Be certain to use <systemitem>encodeForLDAP</systemitem> on attacker controlled data, and not the entire filter string. If you use <systemitem>encodeForLDAP</systemitem> on the entire filter string, then the control characters will be encoded and the filter will fail. For example, the following code is incorrect, and <systemitem>searchFilter</systemitem> will be ill-formed due to encoding control characters.</para>
+    <example id="ldap_ex_search_filter_esapi_bad">
+      <title>Incorrect LDAP Search Filter, ESAPI Encoder</title>
+      <programlisting>Encoder encoder = ESAPI.encoder();
+String cn = request.getParameter("cn");
+String filter = "(&amp;(objectClass=user)(cn=" + cn + "))";
+String searchFilter = encoder.encodeForLDAP(filter);</programlisting>
+    </example>
+  </section>
+  <section id="ldap_encodeForLDAPSearchFilter">
+    <title>encodeForLDAPSearchFilter</title>
+    <para><indexterm><primary>LDAP Injection</primary><secondary>encodeForLDAPSearchFilter</secondary></indexterm><indexterm><primary>encodeForLDAPSearchFilter</primary></indexterm><systemitem>encodeForLDAP</systemitem> showed you how to safely perform a directory search. However, <systemitem>encodeForLDAP</systemitem> does not encode filter operators like <systemitem>&amp;</systemitem>, <systemitem>|</systemitem>, <systemitem>:</systemitem>, <systemitem>!</systemitem> and <systemitem>~</systemitem>. Instead, the filter relies on a bullet proof LDAP parser to parse the input properly.</para>
+    <para>It is possible to use a more restricted encoder for LDAP search filter strings that can tolerate buggy LDAP parsers. The restricted encoder would encode filter operators like <systemitem>&amp;</systemitem>, <systemitem>|</systemitem>, <systemitem>:</systemitem>, <systemitem>!</systemitem> and <systemitem>~</systemitem>, and it is shown in <xref linkend="ldap_ex_encodeForLDAPSearchFilter"/>.</para>
+    <para><systemitem>encodeForLDAPSearchFilter</systemitem> is aggressive in its encoding. The encoder is based on RFC 4515, but it also encodes control characters like <systemitem>&amp;</systemitem>, <systemitem>|</systemitem>, <systemitem>:</systemitem>, <systemitem>!</systemitem> and <systemitem>~</systemitem>. The extra encoding will provide an additional layer of hardening in case of a buggy LDAP parser.</para>
+    <example id="ldap_ex_encodeForLDAPSearchFilter">
+      <title>LDAP Search Filter, Aggressive Encoding</title>
+      <programlisting>String encodeForLDAPSearchFilter(String input, boolean encodeAsterisk)
+{
+    if( input == null ) {
+        return null;
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    for( int i = 0; i &lt; input.length(); i++ ) {
+        final char c = input.charAt(i);
+        switch (c) {
+            case 0x00:  // NUL
+                sb.append("\\00"); break;
+            case '\\':  // ESC
+                sb.append("\\5c"); break;
+            case '/':
+                sb.append("\\2f"); break;
+            case '*':
+                if (encodeAsterisk) {
+                    sb.append("\\2a");
+                } else {
+                    sb.append(c);
+                }
+                break;
+            case '!':
+                sb.append("\\21"); break;
+            case '&amp;':
+                sb.append("\\26"); break;
+            case '(':
+                sb.append("\\28"); break;
+            case ')':
+                sb.append("\\29"); break;
+            case ':':
+                sb.append("\\3a"); break;
+            case '&lt;':
+                sb.append("\\3c"); break;
+            case '=':
+                sb.append("\\3d"); break;
+            case '&gt;':
+                sb.append("\\3e"); break;
+            case '|':
+                sb.append("\\7c"); break;
+            case '~':
+                sb.append("\\7e"); break;
+            default:
+                if( c &gt;= 0x80 ) {
+                    final byte[] u = String.valueOf(c).getBytes("UTF-8");
+                    for (byte b : u) {
+                        sb.append(String.format("\\%02x", b));
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+        }
+        return sb.toString();
+    }
+}</programlisting>
+    </example>
+  </section>
+  <!--
+
+  <section id="ldap_validation">
+    <title>Validation</title>
+    <para><indexterm><primary>LDAP Validation</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>Validation</secondary></indexterm>Many developers will attempt to validate a LDAP string before use. Validating an input is always a good idea, but be aware of the valid character values used in LDAP strings. The valid characters used by LDAP strings are a subset of UTF-8, and according to RFC 4515, the characters are represented in the production <systemitem>UTF1SUBSET</systemitem>.</para>
+    <para>The three <systemitem>UTF1SUBSET</systemitem> ranges use UTF-1, and the character ranges are 0x01-0x27, 0x2B-0x5B and 0x5D-0x7F. <systemitem>UTF1SUBSET</systemitem> excludes 0x00 (NUL), 0x28 (LPAREN), 0x29 (RPAREN), 0x2A (ASTERISK), and 0x5C (ESC). NUL, LPAREN, RPAREN, ASTERISK, ESC and characters 0x80 and above must be escaped using hex encoding.</para>
+    <table frame="all" id="ldap_string_chars">
+      <title>LDAP Filter String Characters</title>
+      <tgroup cols="2" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="range" colwidth="1*"/>
+        <colspec colnum="2" colname="comment" colwidth="1*"/>
+        <thead>
+          <row>
+            <entry>Character Range</entry>
+            <entry>Comment</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>0x01 - 0x27</entry>
+            <entry>UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>0x2B - 0x5B</entry>
+            <entry>UTF1SUBSET</entry>
+          </row>
+          <row>
+            <entry>0x5D - 0x7F</entry>
+            <entry>UTF1SUBSET</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para><indexterm><primary>isValidLDAPString</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>isValidLDAPString</secondary></indexterm>A general LDAP string validator is shown below.</para>
+    <example id="ldap_ex_valid_string">
+      <title>LDAP Filter String Validation</title>
+      <programlisting>boolean isValidLDAPString(String input)
+{
+    if( input == null ) {
+        return false;
+    }
+
+    for( int i = 0; i &lt; input.length(); i++ ) {
+        final char c = number.charAt(i);
+        if ( c &gt;= 0x01 &amp;&amp; c &lt;= 0x27 ) {
+            continue;
+        } else if ( c &gt;= 0x2B &amp;&amp; c &lt;= 0x5B ) {
+            continue;
+        } else if ( c &gt;= 0x5D &amp;&amp; c &lt;= 0x7F ) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}</programlisting>
+    </example>
+    <para><indexterm><primary>isValidLDAPSearchString</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>isValidLDAPSearchString</secondary></indexterm>If you wanted to provide a <systemitem>isValidLDAPSearchString</systemitem>, then you would forbid the additional control characters shown in <xref linkend="ldap_table_filter_chars"/>.</para>
+    <para>It is acceptable to write a validator that is less permissive than one based on <xref linkend="ldap_string_chars"/>. For example, if you want to validate a policy number that consists of a two letter prefix followed by six decimal numbers, then code it similar to the following.</para>
+    <example id="ldap_ex_valid_policy">
+      <title>Exemplary Policy String Validation</title>
+      <programlisting>boolean isValidPolicyString(String input)
+{
+    if( input == null || input.length() != 8 ) {
+        return false;
+    }
+
+    // The valid policy prefixes are AB, CD, WX and YZ
+    final String prefix = input.substring(1, 2);
+    if( prefix.equalsIgnoreCase("AB") == false ||
+        prefix.equalsIgnoreCase("CD") == false ||
+        prefix.equalsIgnoreCase("WX") == false ||
+        prefix.equalsIgnoreCase("YZ") == false ) {
+        return false;
+    }
+
+    // A valid policy number must be 6 decimal digits
+    final String number = input.substring(3, 8);
+    for( int i = 0; i &lt; number.length(); i++ ) {
+        final char c = number.charAt(i);
+        if( c &lt; '0' || c &gt; '9' ) {
+            return false;
+        }
+    }
+    return true;
+}</programlisting>
+    </example>
+  </section>
+
+  -->
+</chapter>

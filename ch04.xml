@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch04_xss">
+  <title>Cross Site Scripting</title>
+  <para><indexterm><primary>Cross Site Scripting</primary></indexterm><indexterm><primary>XSS</primary></indexterm>Cross Site Scripting (XSS) is the scourge of web applications. The vulnerability is a client-side injection attack and occurs when the attacker inserts malicious code into a web page. The malicious code is often sent to the server and later used in a web page provided to subsequent users. This chapter of the book will show you how to use OWASP and ESAPI controls to protect against XSS vulnerabilities.</para>
+  <section id="xss_documentation" xreflabel="Encoder Documentation">
+    <title>Documentation</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>Documentation</secondary></indexterm><indexterm><primary>XSS</primary><secondary>Documentation</secondary></indexterm>Documentation for OWASP <systemitem>Encoder</systemitem> class is located at <ulink url="https://javadoc.io/static/org.owasp.encoder/encoder/1.2.3/index.html?org/owasp/encoder/Encoder.html">Class Encoder</ulink>. Documentation for ESAPI <systemitem>Encoder</systemitem> class is located at <ulink url="https://www.javadoc.io/static/org.owasp.esapi/esapi/2.5.2.0/index.html?org/owasp/esapi/Encoder.html">Interface Encoder</ulink>.</para>
+  </section>
+  <section id="xss_strategy">
+    <title>Strategy</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>Strategy</secondary></indexterm><indexterm><primary>XSS</primary><secondary>Strategy</secondary></indexterm><indexterm><primary>Output Encoding</primary></indexterm>The strategy used to defend against XSS is output encoding. Output encoding is context dependent, and different encoder functions will be used depending on how the vulnerable parameter is used. The vulnerable parameter can be present in HTML, URLs, JavaScript, CSS or JSON.</para>
+    <para>Output encoding translates dangerous characters into a benign representation for display on a web page. The table below shows safe ways to encode dangerous characters.</para>
+    <table frame="all">
+      <title>Safe Encoding of Dangerous HTML Characters</title>
+      <tgroup cols="5" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="character" colwidth="1*"/>
+        <colspec colnum="2" colname="decimal" colwidth="1*"/>
+        <colspec colnum="3" colname="hexadecimal" colwidth="1*"/>
+        <colspec colnum="4" colname="html_entity" colwidth="1*"/>
+        <colspec colnum="5" colname="unicode" colwidth="1*"/>
+        <thead>
+          <row>
+            <entry>Character</entry>
+            <entry>Decimal</entry>
+            <entry>Hexadecimal</entry>
+            <entry>HTML Entity</entry>
+            <entry>Unicode</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>" (double quote)</entry>
+            <entry>&amp;#34</entry>
+            <entry>&amp;#x22</entry>
+            <entry>&amp;quot;</entry>
+            <entry>\u0022</entry>
+          </row>
+          <row>
+            <entry>' (single quote)</entry>
+            <entry>&amp;#39</entry>
+            <entry>&amp;#x27</entry>
+            <entry>&amp;apos;</entry>
+            <entry>\u0027</entry>
+          </row>
+          <row>
+            <entry>&amp; (ampersand)</entry>
+            <entry>&amp;#38</entry>
+            <entry>&amp;#x26</entry>
+            <entry>&amp;amp;</entry>
+            <entry>\u0026</entry>
+          </row>
+          <row>
+            <entry>&lt; (less than)</entry>
+            <entry>&amp;#60</entry>
+            <entry>&amp;#x3C</entry>
+            <entry>&amp;lt;</entry>
+            <entry>\u003c</entry>
+          </row>
+          <row>
+            <entry>&gt; (greater than)</entry>
+            <entry>&amp;#62</entry>
+            <entry>&amp;#x3E</entry>
+            <entry>&amp;gt;</entry>
+            <entry>\u003e</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para>The table below shows XSS defense by context.</para>
+    <table id="xss_defense_by_context" xreflabel="XSS Defense by Context" frame="all">
+      <title>XSS Defense by Context</title>
+      <tgroup cols="3" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="datatype" colwidth="1*"/>
+        <colspec colnum="2" colname="context" colwidth="1*"/>
+        <colspec colnum="3" colname="defense" colwidth="1*"/>
+        <thead>
+          <row>
+            <entry>Data Type</entry>
+            <entry>Context</entry>
+            <entry>Defense</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>String</entry>
+            <entry>HTML Body</entry>
+            <entry>HTML Entity Encoding</entry>
+          </row>
+          <row>
+            <entry>String</entry>
+            <entry>HTML Attribute</entry>
+            <entry>Minimal Attribute Encoding</entry>
+          </row>
+          <row>
+            <entry>String</entry>
+            <entry>GET Parameter</entry>
+            <entry>URL Encoding</entry>
+          </row>
+          <row>
+            <entry>String</entry>
+            <entry>URL</entry>
+            <entry>URL Validation</entry>
+          </row>
+          <row>
+            <entry>String</entry>
+            <entry>CSS</entry>
+            <entry>Structural Validation; CSS Hex Encoding</entry>
+          </row>
+          <row>
+            <entry>HTML</entry>
+            <entry>HTML Body</entry>
+            <entry>HTML Validation; HTML Sanitizer</entry>
+          </row>
+          <row>
+            <entry>N/A</entry>
+            <entry>DOM</entry>
+            <entry>OWASP Cheatsheet</entry>
+          </row>
+          <row>
+            <entry>JavaScript</entry>
+            <entry>All</entry>
+            <entry>Sandboxing</entry>
+          </row>
+          <row>
+            <entry>JSON</entry>
+            <entry>Client Parsing</entry>
+            <entry>JSON Validation</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
+  <section id="xss_html">
+    <title>HTML Body</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>HTML Body</secondary></indexterm><indexterm><primary>XSS</primary><secondary>HTML Body</secondary></indexterm>The primary defense against XSS in HTML body is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in a &lt;body&gt; tag.</para>
+    <para>Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_html_body_owasp">
+      <title>HTML Body, OWASP Encoder</title>
+      <programlisting>&lt;body&gt;&lt;b&gt;&lt;%= Encode.forHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
+    </example>
+    <example id="xss_ex_html_body_esapi">
+      <title>HTML Body, ESAPI Encoder</title>
+      <programlisting>&lt;body&gt;&lt;b&gt;&lt;%= ESAPI.encoder().encodeForHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
+    </example>
+  </section>
+  <section id="xss_html_attrib">
+    <title>HTML Attribute</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>HTML Attribute</secondary></indexterm><indexterm><primary>XSS</primary><secondary>HTML Attribute</secondary></indexterm>The primary defense against XSS in HTML attribute is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is part of an attribute, like in an &lt;input&gt; or &lt;image&gt; tag.</para>
+    <para>Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_html_attrib_owasp">
+      <title>HTML Attribute, OWASP Encoder</title>
+      <programlisting>&lt;input type="text" name="data"
+       value="&lt;%= Encode.forHTMLAttribute(UNTRUSTED) %&gt;" /&gt;</programlisting>
+      <programlisting>&lt;input type="text" name="data"
+       value=&lt;%= Encode.forHTMLUnquotedAttribute(UNTRUSTED) %&gt; /&gt;</programlisting>
+    </example>
+    <example id="xss_ex_html_attrib_esapi">
+      <title>HTML Attribute, ESAPI Encoder</title>
+      <programlisting>&lt;input type="text" name="data"
+       value="&lt;%= ESAPI.encoder().encodeForHTMLAttribute(UNTRUSTED) %&gt;" /&gt;</programlisting>
+    </example>
+  </section>
+  <section id="xss_html_body_vsattrib">
+    <title>HTML Body vs Attribute</title>
+    <para>The main difference between <systemitem>encodeForHTML</systemitem> and <systemitem>encodeForHTMLAttribute</systemitem> is, <systemitem>encodeForHTML</systemitem> does not encode the space character, while <systemitem>encodeForHTMLAttribute</systemitem> encodes the space character as <systemitem>&amp;#x20</systemitem>.</para>
+    <para>An example of HTML Body vs HTML Attribute using the ESAPI encoder is shown below. Notice how the space is handled between the words <emphasis>Hello</emphasis> and <emphasis>World</emphasis>.</para>
+    <example id="xss_ex_html_body_vs_attrib">
+      <title>HTML Body vs Attribute, ESAPI Encoder</title>
+      <programlisting>$ESAPI.encoder().encodeForHTML("&lt;h1&gt;Hello World!&lt;/h1&gt;");
+&amp;lt;h1&amp;gt;Hello World!&amp;lt;/h1&amp;gt;
+
+$ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
+&amp;lt;h1&amp;gt;Hello&amp;#x20;World!&amp;lt;/h1&amp;gt;</programlisting>
+    </example>
+  </section>
+  <section id="xss_js">
+    <title>JavaScript Block</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>JavaScript</secondary></indexterm><indexterm><primary>XSS</primary><secondary>JavaScript</secondary></indexterm>The primary defense against XSS in JavaScript is avoid doing so. Allowing attacker controlled data directly inside a script is dangerous.</para>
+    <para>You should avoid code similar to the following example because it is nearly impossible to guard against XSS. DOM-based XSS is nearly impossible to prevent because the controls run client-side, not server-side. Most controls can be bypassed <systemitem>onerror</systemitem>.</para>
+    <example id="xss_ex_js_avoid">
+      <title>JavaScript Block, Pwned</title>
+      <programlisting>&lt;script type="text/javascript"&gt;
+   window.setInterval('&lt;%= encode(UNTRUSTED and PWNED) %&gt;');
+&lt;/script&gt;</programlisting>
+    </example>
+    <para>Encoding can be used when the attacker controlled text is part of JavaScript. This remediation includes all DOM-based JavaScript event handler attributes such as <systemitem>onfocus</systemitem>, <systemitem>onclick</systemitem>, and <systemitem>onload</systemitem>.</para>
+    <para>Examples of encoding using various encoders are shown below. </para>
+    <example id="xss_ex_js_owasp">
+      <title>JavaScript Block, OWASP Encoder</title>
+      <programlisting>&lt;script type="text/javascript"&gt;
+   var msg = "&lt;%= Encode.forJavaScriptBlock(UNTRUSTED) %&gt;";
+&lt;/script&gt;</programlisting>
+    </example>
+    <example id="xss_ex_js_esapi">
+      <title>JavaScript Block, ESAPI Encoder</title>
+      <programlisting>&lt;script type="text/javascript"&gt;
+   var msg = "&lt;%= ESAPI.encoder().encodeForJavaScript(UNTRUSTED) %&gt;";
+&lt;/script&gt;</programlisting>
+    </example>
+  </section>
+  <section id="xss_inner_html">
+    <title>innerHTML</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>innerHTML</secondary></indexterm><indexterm><primary>XSS</primary><secondary>innerHTML</secondary></indexterm>The primary defense against XSS in HTML body is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in a &lt;body&gt; tag.</para>
+    <para>Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_inner_html_owasp">
+      <title>innerHTML, OWASP Encoder</title>
+      <programlisting>document.getElementById('message').innerHTML =
+            "&lt;%= Encode.forHTML(UNTRUSTED) %&gt;"</programlisting>
+    </example>
+    <example id="xss_ex_inner_html_esapi">
+      <title>innerHTML, ESAPI Encoder</title>
+      <programlisting>document.getElementById('message').innerHTML =
+            "&lt;%= ESAPI.encoder().encodeforHTML(UNTRUSTED) %&gt;"</programlisting>
+    </example>
+  </section>
+  <section id="xss_url">
+    <title>URL</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URL</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URL</secondary></indexterm>The primary defense against XSS in a URL is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_url_owasp">
+      <title>URL, OWASP Encoder</title>
+      <programlisting>Foo bar baz</programlisting>
+    </example>
+    <example id="xss_ex_url_esapi">
+      <title>URL, ESAPI Encoder</title>
+      <programlisting>Foo bar baz</programlisting>
+    </example>
+  </section>
+  <section id="xss_uri">
+    <title>URI</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URI</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URI</secondary></indexterm>The primary defense against XSS in a URI is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_uri_owasp">
+      <title>URI, OWASP Encoder</title>
+      <programlisting>Foo bar baz</programlisting>
+    </example>
+    <example id="xss_ex_uri_esapi">
+      <title>URI, ESAPI Encoder</title>
+      <programlisting>Foo bar baz</programlisting>
+    </example>
+  </section>
+</chapter>

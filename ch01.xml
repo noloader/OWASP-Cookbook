@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<chapter id="ch01_intro">
+  <title>Introduction</title>
+  <para><indexterm><primary>Introduction</primary></indexterm>This document is a guide to using OWASP security controls. The controls help developer teams write safer applications. OWASP provides two libraries to take from, and a team can use either library, depending on what is needed. The first library is the <ulink url="https://owasp.org/www-project-java-encoder/">OWASP Java Encoder</ulink>, and the second library is the <ulink url="https://owasp.org/www-project-enterprise-security-api/">Enterprise Security API</ulink>.</para>
+  <para>The OWASP Java Encoder is a collection of security controls for Java 1.5 and above. The project minimizes dependencies to make it easier to integrate the encoder. If the OWASP Encoder fits your needs then you should use it.</para>
+  <para>The Enterprise Security API (ESAPI) is a collection of security controls for Java 8 and above. The project is feature rich, has more controls and has more dependencies than the OWASP Encoder. The ESAPI project also supports more languages than the OWASP Encoder project. You should use ESAPI when you need rich control and language support.</para>
+  <section id="intro_src_code" xreflabel="Source Code">
+    <title>Source code</title>
+    <para><indexterm><primary>Source code</primary></indexterm>The source code for the Java Encoder can be found on the OWASP GitHub at <ulink url="https://github.com/OWASP/owasp-java-encoder">owasp-java-encoder</ulink>. The source code for ESAPI can be found on the ESAPI GitHub at <ulink url="https://github.com/ESAPI/esapi-java-legacy">esapi-java-legacy</ulink>.</para>
+  </section>
+  <section id="intro_contribute" xreflabel="Contributing">
+    <title>Contributing</title>
+    <para><indexterm><primary>Contributing</primary></indexterm>This book is free software. If you see an opportunity for improvement, an error or an omission then please submit a pull request or open a bug report.</para>
+  </section>
+  <section id="intro_organization" xreflabel="Book Organization">
+    <title>Organization</title>
+    <para><indexterm><primary>Administrivia</primary></indexterm>The book proceeds in eight parts. First, administrivia is discussed, like how to ... TODO: Add something for each chapter of this book.</para>
+  </section>
+  <section id="intro_conventions" xreflabel="Conventions">
+    <title>Conventions</title>
+    <para><indexterm><primary>Conventions</primary></indexterm>The book uses <systemitem>Monospace</systemitem> for program listings and code. Untrusted user input or attacker input is represented as <systemitem>UNTRUSTED</systemitem>, as in <systemitem>encodeForHTML(UNTRUSTED)</systemitem>, or as a block of text</para>
+    <programlisting>String encoded = ESAPI().encoder().encodeForHTML(UNTRUSTED);</programlisting>
+  </section>
+  <section id="intro_application" xreflabel="Applications">
+    <title>Applications</title>
+    <para><indexterm><primary>Design</primary></indexterm>This book provides the tools you need to make an application better and safer. A webapp accepts user input, transforms or acts upon the data, and then provides an output. The company's business logic is embodied in the transformation, and it is your responsibility to make the data and transformation safe from malicious users. Understanding the webapp, its dataflows, and the security controls available will help you build a better and safer application for the company and users.</para>
+  </section>
+</chapter>
