@@ -2,15 +2,16 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <chapter id="ch05_sql_inj">
   <title>SQL Injection</title>
-  <para><indexterm><primary>SQL Injection</primary></indexterm>SQL Injection is the scourge of database programming. The vulnerability is a server-side injection attack and occurs when the attacker inserts malicious code into SQL query. This chapter of the book will show you how to use OWASP and ESAPI controls to protect against SQL vulnerabilities.</para>
+  <para><indexterm><primary>SQL Injection</primary></indexterm>SQL Injection is the scourge of database programming. The vulnerability is a server-side injection attack and occurs when the attacker inserts malicious code into SQL query. OWASP and ESAPI do not supply controls for SQL Injections. Rather, you use the controls provided by the platform you are working on.</para>
   <section id="sql_inj_documentation" xreflabel="PreparedStatement Documentation">
     <title>Documentation</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>Documentation</secondary></indexterm>Documentation for Java <systemitem>PreparedStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/index.html?java/sql/PreparedStatement.html">Interface PreparedStatement</ulink>.</para>
+    <para>OWASP provides a SQL Injection cheat sheet at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">SQL Injection Prevention Cheat Sheet</ulink>.</para>
   </section>
   <section id="sql_inj_strategy">
     <title>Strategy</title>
-    <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Parameterized Queries or Prepared Statements. Parameterized Queries and Prepared Statements keep code and data separate to ensure attacker supplied data is not interpreted as code by the underlying database engine.</para>
-    <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should use Parameterized Queries or Prepared Statements.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Prepared Statements or Parameterized Queries. Prepared Statements and Parameterized Queries keep code and data separate to ensure attacker supplied data is not interpreted as code by the underlying database engine.</para>
+    <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should use Prepared Statements or Parameterized Queries.</para>
     <para>Encoding translates dangerous characters into a benign representations for storage in a database. The table below shows safe ways to encode dangerous characters.</para>
     <table frame="all">
       <title>Safe Encoding of Dangerous SQL Characters</title>
@@ -34,5 +35,45 @@
         </tbody>
       </tgroup>
     </table>
+  </section>
+  <section id="sql_inj_prepared_statement">
+    <title>Prepared Statements</title>
+    <para><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm><indexterm><primary>PreparedStatement</primary></indexterm>Prepared Statements are used in Java as the primary defense against SQL injections. A <systemitem>PreparedStatement</systemitem> is a precompiled SQL statement with placeholders for attacker controlled data.</para>
+    <para>An example of a Prepared Statement is shown below.</para>
+    <example id="sql_inj_ex_prepared_statement_java">
+      <title>Prepared Statement, Java</title>
+      <programlisting>String custName = request.getParameter("customerName");
+String query = "SELECT account_balance FROM user_data WHERE user_name = ?";
+
+PreparedStatement command = connection.prepareStatement(query);
+command.setString(1, custName);
+
+ResultSet results = command.executeQuery( );</programlisting>
+    </example>
+  </section>
+  <section id="sql_inj_parameterized_query">
+    <title>Parameterized Queries</title>
+    <!-- https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand.parameters?view=dotnet-plat-ext-7.0 -->
+    <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm><indexterm><primary>ParameterizedQuery</primary></indexterm>Parameterized Queries are used in .Net as the primary defense against SQL injections. A <systemitem>SqlCommand</systemitem> is a precompiled SQL statement with named parameters for attacker controlled data.</para>
+    <para>An example of a Prepared Statement is shown below. The Microsoft .NET Framework Data Provider for SQL Server does not support the question mark (<systemitem>?</systemitem>) placeholder for passing parameters to a SQL Statement or a stored procedure called by a command of <systemitem>CommandType.Text</systemitem>. A named parameter must be used instead.</para>
+    <example id="sql_inj_ex_parameterized_query_dotnet">
+      <title>Parameterized Query, .Net</title>
+      <programlisting>String custName = request.getParameter("customerName");
+String query = "SELECT account_balance FROM user_data WHERE user_name = @UNAME";
+
+SqlCommand command = new SqlCommand(query, connection);
+command.Parameters.Add("@UNAME", SqlDbType.String);
+command.Parameters["@UNAME"].Value = custName;
+
+ResultSet results = command.executeQuery( );</programlisting>
+    </example>
+  </section>
+  <section id="sql_inj_encoding">
+    <title>Encoding</title>
+    <para>.</para>
+  </section>
+  <section id="sql_inj_dynamic_binding">
+    <title>Dynamic Binding</title>
+    <para>Ugh, don't do it.</para>
   </section>
 </chapter>
