@@ -19,6 +19,17 @@
    <xsl:param name="body.font.family" select="'arial'"/>
    <xsl:param name="body.font.size" select="11"/>
 
+   <!-- http://www.sagehill.net/docbookxsl/FittingText.html -->
+   <xsl:attribute-set name="monospace.verbatim.properties">
+     <xsl:attribute name="font-size">
+       <xsl:choose>
+         <xsl:when test="processing-instruction('db-font-size')"><xsl:value-of
+              select="processing-instruction('db-font-size')"/></xsl:when>
+         <xsl:otherwise>inherit</xsl:otherwise>
+       </xsl:choose>
+     </xsl:attribute>
+   </xsl:attribute-set>
+
    <!-- https://stackoverflow.com/q/52918048 -->
    <xsl:param name="monospace.font.family" select="'courier'"/>
 
