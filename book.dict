@@ -51,6 +51,7 @@ onfocus
 onload
 onerror
 innerHTML
+innerText
 
 untrusted
 Untrusted
@@ -101,5 +102,5 @@ encodeForLDAPSearch
 searchFilter
 distinguishedName
 
-isValidLDAPFilterString
 isValidLDAPString
+isValidLDAPSearchString
