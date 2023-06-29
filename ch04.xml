@@ -231,12 +231,12 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <example id="xss_ex_css_style_block_owasp">
       <title>CSS, Style Block, OWASP Encoder</title>
       <programlisting><?db-font-size 75% ?>&lt;style type="text/css"&gt;
-    background: url('&lt;%=Encode.forCssString(...)%&gt;');
+    background: url('&lt;%=Encode.forCssString(UNTRUSTED)%&gt;');
 &lt;/style&gt;</programlisting>
     </example>
     <example id="xss_ex_css_html_attribute_owasp">
       <title>CSS, HTML Attribute, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;div style="background: url('&lt;=Encode.forCssString(...)%&gt;');"&gt;</programlisting>
+      <programlisting><?db-font-size 75% ?>&lt;div style="background: url('&lt;=Encode.forCssString(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
     <example id="xss_ex_css_esapi">
       <title>CSS, ESAPI Encoder</title>

@@ -47,9 +47,8 @@
 
 String query = "SELECT balance FROM userdata WHERE username = " + custName;
 Statement statement = connection.createStatement(...);
-ResultSet results = statement.executeQuery(query);
 
-ResultSet results = statement.executeQuery( );</programlisting>
+ResultSet results = statement.executeQuery(query);</programlisting>
     </example>
     <para>An example of a Prepared Statement is shown below.</para>
     <example id="sql_inj_ex_prepared_statement_java">
