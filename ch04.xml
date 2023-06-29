@@ -226,7 +226,7 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
   <section id="xss_css">
     <title>Cascading Style Sheets</title>
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>CSS</secondary></indexterm><indexterm><primary>XSS</primary><secondary>CSS</secondary></indexterm>The primary defense against XSS in Cascading Style Sheets is hexadecimal encoding. Use the encoding method for style blocks and attributes in HTML.</para>
-    <para>Hexidecimal encoding is applied to U+0000-U+001f, <systemitem>"</systemitem>, <systemitem>'</systemitem>, <systemitem>\</systemitem>, <systemitem>&lt;</systemitem>, <systemitem>&amp;</systemitem>, <systemitem>(</systemitem>, <systemitem>)</systemitem>, <systemitem>/</systemitem>, <systemitem>&gt;</systemitem>, U+007f, line separator (U+2028), paragraph separator (U+2029).</para>
+    <para>Hexadecimal encoding is applied to U+0000-U+001f, <systemitem>"</systemitem>, <systemitem>'</systemitem>, <systemitem>\</systemitem>, <systemitem>&lt;</systemitem>, <systemitem>&amp;</systemitem>, <systemitem>(</systemitem>, <systemitem>)</systemitem>, <systemitem>/</systemitem>, <systemitem>&gt;</systemitem>, U+007f, line separator (U+2028), paragraph separator (U+2029).</para>
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_css_style_block_owasp">
       <title>CSS, Style Block, OWASP Encoder</title>
