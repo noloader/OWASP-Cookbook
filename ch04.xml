@@ -201,7 +201,7 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
   </section>
   <section id="xss_inner_html">
     <title>innerHTML</title>
-    <para><indexterm><primary>Cross Site Scripting</primary><secondary>innerHTML</secondary></indexterm><indexterm><primary>XSS</primary><secondary>innerHTML</secondary></indexterm>The primary defense against XSS in HTML body is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in a &lt;body&gt; tag.</para>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>innerHTML</secondary></indexterm><indexterm><primary>XSS</primary><secondary>innerHTML</secondary></indexterm>The primary defense against XSS in <systemitem>innerHTML</systemitem> is to avoid it and use <systemitem>innerText</systemitem>. If you must use <systemitem>innerHTML</systemitem>, then the defense is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in the <systemitem>innerHTML</systemitem>.</para>
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_inner_html_owasp">
       <title>innerHTML, OWASP Encoder</title>
@@ -214,9 +214,29 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
             "&lt;%= ESAPI.encoder().encodeforHTML(UNTRUSTED) %&gt;"</programlisting>
     </example>
   </section>
+  <section id="xss_css">
+    <title>Cascading Style Sheets</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>CSS</secondary></indexterm><indexterm><primary>XSS</primary><secondary>CSS</secondary></indexterm>The primary defense against XSS in Cascading Style Sheets is hexadecimal encoding. Use the encoding method for style blocks and attributes in HTML.</para>
+    <para>Hexidecimal encoding is applied to U+0000-U+001f, <systemitem>"</systemitem>, <systemitem>'</systemitem>, <systemitem>\</systemitem>, <systemitem>&lt;</systemitem>, <systemitem>&amp;</systemitem>, <systemitem>(</systemitem>, <systemitem>)</systemitem>, <systemitem>/</systemitem>, <systemitem>&gt;</systemitem>, U+007f, line separator (U+2028), paragraph separator (U+2029).</para>
+    <para>Examples of encoding using various encoders are shown below.</para>
+    <example id="xss_ex_css_style_block_owasp">
+      <title>CSS, Style Block, OWASP Encoder</title>
+      <programlisting>&lt;style type="text/css"&gt;
+    background: url('&lt;%=Encode.forCssString(...)%&gt;');
+&lt;/style&gt;</programlisting>
+    </example>
+    <example id="xss_ex_css_html_attribute_owasp">
+      <title>CSS, HTML Attribute, OWASP Encoder</title>
+      <programlisting>&lt;div style="background: url('&lt;=Encode.forCssString(...)%&gt;');"&gt;</programlisting>
+    </example>
+    <example id="xss_ex_css_esapi">
+      <title>CSS, ESAPI Encoder</title>
+      <programlisting>Foo bar baz</programlisting>
+    </example>
+  </section>
   <section id="xss_url">
-    <title>URL</title>
-    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URL</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URL</secondary></indexterm>The primary defense against XSS in a URL is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
+    <title>Universal Resource Locator</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URL</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URL</secondary></indexterm>The primary defense against XSS in a Universal Resource Locator (URL) is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_url_owasp">
       <title>URL, OWASP Encoder</title>
       <programlisting>Foo bar baz</programlisting>
@@ -227,8 +247,8 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     </example>
   </section>
   <section id="xss_uri">
-    <title>URI</title>
-    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URI</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URI</secondary></indexterm>The primary defense against XSS in a URI is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
+    <title>Uniform Resource Identifier</title>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>URI</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URI</secondary></indexterm>The primary defense against XSS in a Uniform Resource Identifier (URI) is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_uri_owasp">
       <title>URI, OWASP Encoder</title>
       <programlisting>Foo bar baz</programlisting>
