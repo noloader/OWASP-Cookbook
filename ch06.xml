@@ -218,7 +218,7 @@
     <para>Note the code below encodes <systemitem>cn</systemitem>, <systemitem>dc2</systemitem> and <systemitem>dc1</systemitem> because the attacker controls the values. The code below does not encode <systemitem>distinguishedName</systemitem> because it is controlled by the program, and characters like <systemitem>"</systemitem>, <systemitem>#</systemitem>, <systemitem>+</systemitem>, <systemitem>;</systemitem>, <systemitem>&lt;</systemitem> and <systemitem>&gt;</systemitem> are control characters required by the processor.</para>
     <example id="ldap_ex_distinguished_name_good">
       <title>LDAP Distinguished Name, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Encoder encoder = ESAPI.encoder();
+      <programlisting><?code-font-size 75% ?>Encoder encoder = ESAPI.encoder();
 String  cn = encoder.encodeForDN(request.getParameter("cn"));
 String dc2 = encoder.encodeForDN(request.getParameter("dc2"));
 String dc1 = encoder.encodeForDN(request.getParameter("dc1"));
@@ -228,7 +228,7 @@ String distinguishedName = "CN=" + cn + ",DC=" + dc2 + ",DC=" + dc1;</programlis
     <para>Be certain to use <systemitem>encodeForDN</systemitem> on attacker controlled data, and not the entire distinguished name string. If you use <systemitem>encodeForDN</systemitem> on the entire distinguished name string, then the control characters will be encoded and modifications or updates on the object will fail. For example, the following code is incorrect, and <systemitem>distinguishedName</systemitem> will be ill-formed due to encoding control characters.</para>
     <example id="ldap_ex_distinguished_name_bad">
       <title>Incorrect LDAP Distinguished Name, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Encoder encoder = ESAPI.encoder();
+      <programlisting><?code-font-size 75% ?>Encoder encoder = ESAPI.encoder();
 String  cn = request.getParameter("cn");
 String dc2 = request.getParameter("dc2");
 String dc1 = request.getParameter("dc1");
@@ -242,14 +242,14 @@ String distinguishedName = encoder.encodeForDN(dn);</programlisting>
     <para>Note the code below encodes <systemitem>cn</systemitem> because the attacker controls the value. The code below does not encode <systemitem>searchFilter</systemitem> because it is controlled by the program, and characters like <systemitem>(</systemitem>, <systemitem>)</systemitem>, <systemitem>=</systemitem> and <systemitem>&amp;</systemitem> are control characters required by the filter.</para>
     <example id="ldap_ex_search_filter_esapi_good">
       <title>LDAP Search Filter, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Encoder encoder = ESAPI.encoder();
+      <programlisting><?code-font-size 75% ?>Encoder encoder = ESAPI.encoder();
 String cn = encoder.encodeForLDAP(request.getParameter("cn"));
 String searchFilter = "(&amp;(objectClass=user)(cn=" + cn + "))";</programlisting>
     </example>
     <para>Be certain to use <systemitem>encodeForLDAP</systemitem> on attacker controlled data, and not the entire filter string. If you use <systemitem>encodeForLDAP</systemitem> on the entire filter string, then the control characters will be encoded and the filter will fail. For example, the following code is incorrect, and <systemitem>searchFilter</systemitem> will be ill-formed due to encoding control characters.</para>
     <example id="ldap_ex_search_filter_esapi_bad">
       <title>Incorrect LDAP Search Filter, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Encoder encoder = ESAPI.encoder();
+      <programlisting><?code-font-size 75% ?>Encoder encoder = ESAPI.encoder();
 String cn = request.getParameter("cn");
 String filter = "(&amp;(objectClass=user)(cn=" + cn + "))";
 String searchFilter = encoder.encodeForLDAP(filter);</programlisting>
@@ -262,7 +262,7 @@ String searchFilter = encoder.encodeForLDAP(filter);</programlisting>
     <para><systemitem>encodeForLDAPSearchFilter</systemitem> is aggressive in its encoding. The encoder is based on RFC 4515, but it also encodes control characters like <systemitem>&amp;</systemitem>, <systemitem>|</systemitem>, <systemitem>:</systemitem>, <systemitem>!</systemitem> and <systemitem>~</systemitem>. The extra encoding will provide an additional layer of hardening in case of a buggy LDAP parser.</para>
     <example id="ldap_ex_encodeForLDAPSearchFilter">
       <title>LDAP Search Filter, Aggressive Encoding</title>
-      <programlisting><?db-font-size 75% ?>String encodeForLDAPSearchFilter(String input, boolean encodeAsterisk)
+      <programlisting><?code-font-size 75% ?>String encodeForLDAPSearchFilter(String input, boolean encodeAsterisk)
 {
     if( input == null ) {
         return null;
@@ -358,7 +358,7 @@ String searchFilter = encoder.encodeForLDAP(filter);</programlisting>
     <para><indexterm><primary>isValidLDAPString</primary></indexterm><indexterm><primary>LDAP Injection</primary><secondary>isValidLDAPString</secondary></indexterm>A general LDAP string validator is shown below.</para>
     <example id="ldap_ex_valid_string">
       <title>LDAP Filter String Validation</title>
-      <programlisting><?db-font-size 75% ?>boolean isValidLDAPString(String input)
+      <programlisting><?code-font-size 75% ?>boolean isValidLDAPString(String input)
 {
     if( input == null ) {
         return false;
@@ -383,7 +383,7 @@ String searchFilter = encoder.encodeForLDAP(filter);</programlisting>
     <para>It is acceptable to write a validator that is less permissive than one based on <xref linkend="ldap_string_chars"/>. For example, if you want to validate a policy number that consists of a two letter prefix followed by six decimal numbers, then code it similar to the following.</para>
     <example id="ldap_ex_valid_policy">
       <title>Exemplary Policy String Validation</title>
-      <programlisting><?db-font-size 75% ?>boolean isValidPolicyString(String input)
+      <programlisting><?code-font-size 75% ?>boolean isValidPolicyString(String input)
 {
     if( input == null || input.length() != 8 ) {
         return false;

@@ -43,7 +43,7 @@
     <para>An example of a vulnerable query is shown below.</para>
     <example id="sql_inj_ex_prepared_statement_java_bad">
       <title>Prepared Statement, Java, Pwned</title>
-      <programlisting><?db-font-size 75% ?>String custName = request.getParameter("customerName");
+      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
 
 String query = "SELECT balance FROM userdata WHERE username = " + custName;
 Statement statement = connection.createStatement(...);
@@ -53,7 +53,7 @@ ResultSet results = statement.executeQuery(query);</programlisting>
     <para>An example of a Prepared Statement is shown below.</para>
     <example id="sql_inj_ex_prepared_statement_java">
       <title>Prepared Statement, Java</title>
-      <programlisting><?db-font-size 75% ?>String custName = request.getParameter("customerName");
+      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
 String query = "SELECT balance FROM userdata WHERE username = ?";
 
 PreparedStatement command = connection.prepareStatement(query);
@@ -69,7 +69,7 @@ ResultSet results = command.executeQuery( );</programlisting>
     <para>An example of a Prepared Statement is shown below. The Microsoft .NET Framework Data Provider for SQL Server does not support the question mark (<systemitem>?</systemitem>) placeholder for passing parameters to a SQL Statement or a stored procedure called by a command of <systemitem>CommandType.Text</systemitem>. A named parameter must be used instead.</para>
     <example id="sql_inj_ex_parameterized_query_dotnet">
       <title>Parameterized Query, .Net</title>
-      <programlisting><?db-font-size 75% ?>String custName = request.getParameter("customerName");
+      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
 String query = "SELECT balance FROM userdata WHERE username = @UNAME";
 
 SqlCommand command = new SqlCommand(query, connection);

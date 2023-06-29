@@ -20,7 +20,7 @@
   <section id="intro_conventions" xreflabel="Conventions">
     <title>Conventions</title>
     <para><indexterm><primary>Conventions</primary></indexterm>The book uses <systemitem>Monospace</systemitem> for program listings and code. Untrusted user input or attacker input is represented as <systemitem>UNTRUSTED</systemitem>, as in <systemitem>encodeForHTML(UNTRUSTED)</systemitem>, or as a block of text</para>
-    <programlisting><?db-font-size 75% ?>String encoded = ESAPI().encoder().encodeForHTML(UNTRUSTED);</programlisting>
+    <programlisting><?code-font-size 75% ?>String encoded = ESAPI().encoder().encodeForHTML(UNTRUSTED);</programlisting>
   </section>
   <section id="intro_application" xreflabel="Applications">
     <title>Applications</title>

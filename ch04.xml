@@ -137,11 +137,11 @@
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_html_body_owasp">
       <title>HTML Body, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;body&gt;&lt;b&gt;&lt;%= Encode.forHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
+      <programlisting><?code-font-size 75% ?>&lt;body&gt;&lt;b&gt;&lt;%= Encode.forHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
     </example>
     <example id="xss_ex_html_body_esapi">
       <title>HTML Body, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;body&gt;&lt;b&gt;&lt;%= ESAPI.encoder().encodeForHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
+      <programlisting><?code-font-size 75% ?>&lt;body&gt;&lt;b&gt;&lt;%= ESAPI.encoder().encodeForHTML(UNTRUSTED) %&gt;" /&gt;&lt;/b&gt;&lt;/body&gt;</programlisting>
     </example>
   </section>
   <section id="xss_html_attrib">
@@ -150,14 +150,14 @@
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_html_attrib_owasp">
       <title>HTML Attribute, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;input type="text" name="data"
+      <programlisting><?code-font-size 75% ?>&lt;input type="text" name="data"
        value="&lt;%= Encode.forHTMLAttribute(UNTRUSTED) %&gt;" /&gt;</programlisting>
-      <programlisting><?db-font-size 75% ?>&lt;input type="text" name="data"
+      <programlisting><?code-font-size 75% ?>&lt;input type="text" name="data"
        value=&lt;%= Encode.forHTMLUnquotedAttribute(UNTRUSTED) %&gt; /&gt;</programlisting>
     </example>
     <example id="xss_ex_html_attrib_esapi">
       <title>HTML Attribute, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;input type="text" name="data"
+      <programlisting><?code-font-size 75% ?>&lt;input type="text" name="data"
        value="&lt;%= ESAPI.encoder().encodeForHTMLAttribute(UNTRUSTED) %&gt;" /&gt;</programlisting>
     </example>
   </section>
@@ -167,7 +167,7 @@
     <para>An example of HTML Body vs HTML Attribute using the ESAPI encoder is shown below. Notice how the space is handled between the words <emphasis>Hello</emphasis> and <emphasis>World</emphasis>.</para>
     <example id="xss_ex_html_body_vs_attrib">
       <title>HTML Body vs Attribute, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>$ESAPI.encoder().encodeForHTML("&lt;h1&gt;Hello World!&lt;/h1&gt;");
+      <programlisting><?code-font-size 75% ?>$ESAPI.encoder().encodeForHTML("&lt;h1&gt;Hello World!&lt;/h1&gt;");
 &amp;lt;h1&amp;gt;Hello World!&amp;lt;/h1&amp;gt;
 
 $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
@@ -180,7 +180,7 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para>You should avoid code similar to the following example because it is nearly impossible to guard against XSS. DOM-based XSS is nearly impossible to prevent because the controls run client-side, not server-side. Most controls can be bypassed <systemitem>onerror</systemitem>.</para>
     <example id="xss_ex_js_avoid">
       <title>JavaScript Block, Pwned</title>
-      <programlisting><?db-font-size 75% ?>&lt;script type="text/javascript"&gt;
+      <programlisting><?code-font-size 75% ?>&lt;script type="text/javascript"&gt;
    window.setInterval('&lt;%= encode(UNTRUSTED and PWNED) %&gt;');
 &lt;/script&gt;</programlisting>
     </example>
@@ -188,22 +188,22 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para>Examples of encoding using various encoders are shown below. Note that the developer must supply the quotes for the strings.</para>
     <example id="xss_ex_js_html_attribute_owasp">
       <title>JavaScript, HTML Attribute, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;button onclick="alert('&lt;%=Encode.forJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
+      <programlisting><?code-font-size 75% ?>&lt;button onclick="alert('&lt;%=Encode.forJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
     <example id="xss_ex_js_block_owasp">
       <title>JavaScript Block, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;script type="text/javascript"&gt;
+      <programlisting><?code-font-size 75% ?>&lt;script type="text/javascript"&gt;
    var msg = "&lt;%= Encode.forJavaScriptBlock(UNTRUSTED) %&gt;";
 &lt;/script&gt;</programlisting>
     </example>
     <example id="xss_ex_js_html_attribute_esapi">
       <title>JavaScript, HTML Attribute, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;button onclick=
+      <programlisting><?code-font-size 75% ?>&lt;button onclick=
     "alert('&lt;%=ESAPI.encoder().encodeForJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
     <example id="xss_ex_js_block_esapi">
       <title>JavaScript Block, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;script type="text/javascript"&gt;
+      <programlisting><?code-font-size 75% ?>&lt;script type="text/javascript"&gt;
    var msg = "&lt;%= ESAPI.encoder().encodeForJavaScript(UNTRUSTED) %&gt;";
 &lt;/script&gt;</programlisting>
     </example>
@@ -214,12 +214,12 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_inner_html_owasp">
       <title>innerHTML, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>document.getElementById('message').innerHTML =
+      <programlisting><?code-font-size 75% ?>document.getElementById('message').innerHTML =
             "&lt;%= Encode.forHTML(UNTRUSTED) %&gt;"</programlisting>
     </example>
     <example id="xss_ex_inner_html_esapi">
       <title>innerHTML, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>document.getElementById('message').innerHTML =
+      <programlisting><?code-font-size 75% ?>document.getElementById('message').innerHTML =
             "&lt;%= ESAPI.encoder().encodeforHTML(UNTRUSTED) %&gt;"</programlisting>
     </example>
   </section>
@@ -230,17 +230,17 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_css_style_block_owasp">
       <title>CSS, Style Block, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;style type="text/css"&gt;
+      <programlisting><?code-font-size 75% ?>&lt;style type="text/css"&gt;
     background: url('&lt;%=Encode.forCssString(UNTRUSTED)%&gt;');
 &lt;/style&gt;</programlisting>
     </example>
     <example id="xss_ex_css_html_attribute_owasp">
       <title>CSS, HTML Attribute, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>&lt;div style="background: url('&lt;=Encode.forCssString(UNTRUSTED)%&gt;');"&gt;</programlisting>
+      <programlisting><?code-font-size 75% ?>&lt;div style="background: url('&lt;=Encode.forCssString(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
     <example id="xss_ex_css_esapi">
       <title>CSS, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Foo bar baz</programlisting>
+      <programlisting><?code-font-size 75% ?>Foo bar baz</programlisting>
     </example>
   </section>
   <section id="xss_url">
@@ -248,11 +248,11 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>URL</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URL</secondary></indexterm>The primary defense against XSS in a Universal Resource Locator (URL) is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_url_owasp">
       <title>URL, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>Foo bar baz</programlisting>
+      <programlisting><?code-font-size 75% ?>Foo bar baz</programlisting>
     </example>
     <example id="xss_ex_url_esapi">
       <title>URL, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Foo bar baz</programlisting>
+      <programlisting><?code-font-size 75% ?>Foo bar baz</programlisting>
     </example>
   </section>
   <section id="xss_uri">
@@ -260,11 +260,11 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>URI</secondary></indexterm><indexterm><primary>XSS</primary><secondary>URI</secondary></indexterm>The primary defense against XSS in a Uniform Resource Identifier (URI) is URL escaping or percent encoding. Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_uri_owasp">
       <title>URI, OWASP Encoder</title>
-      <programlisting><?db-font-size 75% ?>Foo bar baz</programlisting>
+      <programlisting><?code-font-size 75% ?>Foo bar baz</programlisting>
     </example>
     <example id="xss_ex_uri_esapi">
       <title>URI, ESAPI Encoder</title>
-      <programlisting><?db-font-size 75% ?>Foo bar baz</programlisting>
+      <programlisting><?code-font-size 75% ?>Foo bar baz</programlisting>
     </example>
   </section>
 </chapter>
