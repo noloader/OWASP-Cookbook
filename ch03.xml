@@ -59,7 +59,7 @@
     <para>The code shown below in <xref linkend="context_bad_code"/> <emphasis>will not</emphasis> work as expected. It is an incomplete remediation because it only addresses injections in the HTML body of the webpage returned to the user.</para>
     <example id="context_bad_code">
       <title>Incomplete Remediation</title>
-      <programlisting>Encoder encoder = ESAPI.encoder();
+      <programlisting><?db-font-size 75% ?>Encoder encoder = ESAPI.encoder();
 String userText = encoder.encodeForHTML(
                           request.getParameter("userText"));
 
@@ -81,7 +81,7 @@ EmailUserText(userText);</programlisting>
     <para>The code shown below in <xref linkend="context_good_code"/> <emphasis>will</emphasis> work as expected. It is a complete remediation because it addresses injections in all the output contexts, and not just the context of the web page returned to the user.</para>
     <example id="context_good_code">
       <title>Complete Remediation</title>
-      <programlisting>String userText = request.getParameter("userText");
+      <programlisting><?db-font-size 75% ?>String userText = request.getParameter("userText");
 
 // userText returned in a response webpage. Safe for use.
 Encoder encoder = ESAPI.encoder();
