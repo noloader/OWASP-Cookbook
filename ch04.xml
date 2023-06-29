@@ -175,7 +175,7 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     </example>
   </section>
   <section id="xss_js">
-    <title>JavaScript Block</title>
+    <title>JavaScript</title>
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>JavaScript</secondary></indexterm><indexterm><primary>XSS</primary><secondary>JavaScript</secondary></indexterm>The primary defense against XSS in JavaScript is avoid doing so. Allowing attacker controlled data directly inside a script is dangerous.</para>
     <para>You should avoid code similar to the following example because it is nearly impossible to guard against XSS. DOM-based XSS is nearly impossible to prevent because the controls run client-side, not server-side. Most controls can be bypassed <systemitem>onerror</systemitem>.</para>
     <example id="xss_ex_js_avoid">
@@ -185,14 +185,23 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
 &lt;/script&gt;</programlisting>
     </example>
     <para>Encoding can be used when the attacker controlled text is part of JavaScript. This remediation includes all DOM-based JavaScript event handler attributes such as <systemitem>onfocus</systemitem>, <systemitem>onclick</systemitem>, and <systemitem>onload</systemitem>.</para>
-    <para>Examples of encoding using various encoders are shown below. </para>
-    <example id="xss_ex_js_owasp">
+    <para>Examples of encoding using various encoders are shown below. Note that the developer must supply the quotes for the strings.</para>
+    <example id="xss_ex_js_html_attribute_owasp">
+      <title>JavaScript, HTML Attribute, OWASP Encoder</title>
+      <programlisting>&lt;button onclick="alert('&lt;%=Encode.forJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
+    </example>
+    <example id="xss_ex_js_block_owasp">
       <title>JavaScript Block, OWASP Encoder</title>
       <programlisting>&lt;script type="text/javascript"&gt;
    var msg = "&lt;%= Encode.forJavaScriptBlock(UNTRUSTED) %&gt;";
 &lt;/script&gt;</programlisting>
     </example>
-    <example id="xss_ex_js_esapi">
+    <example id="xss_ex_js_html_attribute_esapi">
+      <title>JavaScript, HTML Attribute, ESAPI Encoder</title>
+      <programlisting>&lt;button onclick=
+    "alert('&lt;%=ESAPI.encoder().encodeForJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
+    </example>
+    <example id="xss_ex_js_block_esapi">
       <title>JavaScript Block, ESAPI Encoder</title>
       <programlisting>&lt;script type="text/javascript"&gt;
    var msg = "&lt;%= ESAPI.encoder().encodeForJavaScript(UNTRUSTED) %&gt;";
