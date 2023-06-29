@@ -43,7 +43,7 @@
     <example id="sql_inj_ex_prepared_statement_java">
       <title>Prepared Statement, Java</title>
       <programlisting>String custName = request.getParameter("customerName");
-String query = "SELECT account_balance FROM user_data WHERE user_name = ?";
+String query = "SELECTbalance FROM userdata WHERE user_name = ?";
 
 PreparedStatement command = connection.prepareStatement(query);
 command.setString(1, custName);
@@ -59,7 +59,7 @@ ResultSet results = command.executeQuery( );</programlisting>
     <example id="sql_inj_ex_parameterized_query_dotnet">
       <title>Parameterized Query, .Net</title>
       <programlisting>String custName = request.getParameter("customerName");
-String query = "SELECT account_balance FROM user_data WHERE user_name = @UNAME";
+String query = "SELECTbalance FROM userdata WHERE user_name = @UNAME";
 
 SqlCommand command = new SqlCommand(query, connection);
 command.Parameters.Add("@UNAME", SqlDbType.String);
