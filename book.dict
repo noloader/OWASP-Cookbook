@@ -64,6 +64,7 @@ validator
 plaintext
 ciphertext
 remediation
+precompiled
 sanitization
 remediations
 
@@ -92,6 +93,9 @@ UTF1SUBSET
 
 DefaultEncoder
 PreparedStatement
+CommandType
+ParameterizedQuery
+SqlCommand
 
 encodeForDN
 encodeAsterisk
