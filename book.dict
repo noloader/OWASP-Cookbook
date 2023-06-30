@@ -2,6 +2,9 @@ RFC
 IETF
 W3C
 
+Chinook
+Northwind
+
 HTML
 html
 JavaScript
@@ -96,6 +99,7 @@ UTF1SUBSET
 
 DefaultEncoder
 PreparedStatement
+CallableStatement
 CommandType
 ParameterizedQuery
 SqlCommand
@@ -111,3 +115,7 @@ distinguishedName
 
 isValidLDAPString
 isValidLDAPSearchString
+getCustomerName
+
+firstName
+lastName
