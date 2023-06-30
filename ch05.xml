@@ -6,6 +6,7 @@
   <section id="sql_inj_documentation" xreflabel="PreparedStatement Documentation">
     <title>Documentation</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>Documentation</secondary></indexterm><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm>Documentation for Java <systemitem>PreparedStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/index.html?java/sql/PreparedStatement.html">Interface PreparedStatement</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>CallableStatement</secondary></indexterm>Documentation for Java <systemitem>CallableStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/java/sql/CallableStatement.html">Interface CallableStatement</ulink>.</para>
     <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm>Documentation for .Net <systemitem>SqlCommand</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand">SqlCommand Class</ulink>.</para>
     <para>OWASP provides a SQL Injection cheat sheet at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">SQL Injection Prevention Cheat Sheet</ulink>.</para>
   </section>
@@ -37,44 +38,126 @@
       </tgroup>
     </table>
   </section>
-  <section id="sql_inj_prepared_statement">
+  <section id="sql_inj_chinook_db">
+    <title>Chinook Database</title>
+    <para><indexterm><primary>Chinook</primary></indexterm><ulink url="https://github.com/lerocha/chinook-database">The Chinook database</ulink> is a sample database available for SQL Server, Oracle, MySQL, and SQLite. Chinook is the free/open source software equivalent to Microsoft's Northwind database.</para>
+    <para>Chinook is used in the code samples below. The output below shows some of Chinook's schema.</para>
+    <example id="sql_inj_chinook_schema">
+      <title>Chinook Database Schema</title>
+      <programlisting><?code-font-size 75% ?>$ sqlite3 Chinook.sqlite
+sqlite&gt; .tables
+Album          Employee       InvoiceLine    PlaylistTrack
+Artist         Genre          MediaType      Track
+Customer       Invoice        Playlist
+
+sqlite&gt; .schema Album
+CREATE TABLE [Album]
+(
+    [AlbumId] INTEGER  NOT NULL,
+    [Title] NVARCHAR(160)  NOT NULL,
+    [ArtistId] INTEGER  NOT NULL,
+    CONSTRAINT [PK_Album] PRIMARY KEY  ([AlbumId]),
+    FOREIGN KEY ([ArtistId]) REFERENCES [Artist] ([ArtistId])
+                ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX [IFK_AlbumArtistId] ON [Album] ([ArtistId]);
+
+sqlite&gt; .schema Artist
+CREATE TABLE [Artist]
+(
+    [ArtistId] INTEGER  NOT NULL,
+    [Name] NVARCHAR(120),
+    CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])
+);
+
+sqlite&gt; .schema Customer
+CREATE TABLE [Customer]
+(
+    [CustomerId] INTEGER  NOT NULL,
+    [FirstName] NVARCHAR(40)  NOT NULL,
+    [LastName] NVARCHAR(20)  NOT NULL,
+    [Company] NVARCHAR(80),
+    [Address] NVARCHAR(70),
+    [City] NVARCHAR(40),
+    [State] NVARCHAR(40),
+    [Country] NVARCHAR(40),
+    [PostalCode] NVARCHAR(10),
+    [Phone] NVARCHAR(24),
+    [Fax] NVARCHAR(24),
+    [Email] NVARCHAR(60)  NOT NULL,
+    [SupportRepId] INTEGER,
+    CONSTRAINT [PK_Customer] PRIMARY KEY  ([CustomerId]),
+    FOREIGN KEY ([SupportRepId]) REFERENCES [Employee] ([EmployeeId])
+                ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+CREATE INDEX [IFK_CustomerSupportRepId] ON [Customer] ([SupportRepId]);</programlisting>
+    </example>
+  </section>
+  <section id="sql_inj_prepared_statement" xreflabel="Prepared Statements">
     <title>Prepared Statements</title>
-    <para><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm><indexterm><primary>PreparedStatement</primary></indexterm>Prepared Statements are used in Java as the primary defense against SQL injections. A <systemitem>PreparedStatement</systemitem> is a precompiled SQL statement with placeholders for attacker controlled data. Java uses the question mark (<systemitem>?</systemitem>) as a placeholder for the user supplied data.</para>
-    <para>An example of a vulnerable query is shown below. The code is vulnerable due to concatenation without a mitigation.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm><indexterm><primary>PreparedStatement</primary></indexterm>Prepared Statements are used in Java as the primary defense against SQL injections. A <systemitem>PreparedStatement</systemitem> is a precompiled SQL statement with placeholders for for user supplied or attacker controlled data. Java uses the question mark (<systemitem>?</systemitem>) as a placeholder for the data.</para>
+    <para>An example of a vulnerable query is shown below. The code is vulnerable due to simple concatenation, and lack of a Prepared Statement or Callable Statement in Java.</para>
     <example id="sql_inj_ex_prepared_statement_java_bad">
       <title>Prepared Statement, Java, Pwned</title>
-      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
 
-String query = "SELECT balance FROM userdata WHERE username = " + custName;
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = " + lastName;
 Statement statement = connection.createStatement(...);
 
 ResultSet results = statement.executeQuery(query);</programlisting>
     </example>
-    <para>An example of a Prepared Statement is shown below.</para>
+    <para>An example of a Prepared Statement is shown below. The Prepared Statement is not vulnerable to a SQL Injection because the data is not interpreted as code.</para>
     <example id="sql_inj_ex_prepared_statement_java">
       <title>Prepared Statement, Java</title>
-      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
-String query = "SELECT balance FROM userdata WHERE username = ?";
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = ?";
 
 PreparedStatement command = connection.prepareStatement(query);
-command.setString(1, custName);
+command.setString(1, lastName);
 
 ResultSet results = command.executeQuery( );</programlisting>
     </example>
+    <para>If you want to use a Prepared Statement inside a Stored Procedure in Java, then you should use <xref linkend="sql_inj_callable_statement"/> instead.</para>
   </section>
-  <section id="sql_inj_parameterized_query">
+  <section id="sql_inj_callable_statement" xreflabel="Callable Statements">
+    <title>Callable Statements</title>
+    <para><indexterm><primary>SQL Injection</primary><secondary>CallableStatement</secondary></indexterm><indexterm><primary>CallableStatement</primary></indexterm>Callable Statements along with parameter binding are used to defend against SQL Injections in <indexterm><primary>SQL Injection</primary><secondary>Stored Procedure</secondary></indexterm><indexterm><primary>Stored Procedure</primary></indexterm>Stored Procedures. An example of a Callable Statement is shown below. The Callable Statements is not vulnerable to a SQL Injection because the data is not interpreted as code.</para>
+    <example id="sql_inj_ex_callable_statement_java">
+      <title>Callable Statement, Java</title>
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+
+CallableStatement statement = connection.prepareCall("{call sp_getCustomerName(?, ?)}");
+statement.setString(1, lastName);
+
+statement.registerOutParameter(1, Types.NVARCHAR);
+statement.registerOutParameter(2, Types.NVARCHAR);
+
+ResultSet results = statement.executeQuery();</programlisting>
+    </example>
+    <para>The SQL code for <systemitem>sp_getCustomerName</systemitem> would look similar to below. The definitions for <systemitem>lastName</systemitem> and <systemitem>firstName</systemitem> are taken from <xref linkend="sql_inj_chinook_schema"/>.</para>
+    <programlisting><?code-font-size 75% ?>CREATE PROCEDURE sp_getCustomerName(INOUT lastName NVARCHAR(20), \
+                                    OUT  firstName NVARCHAR(40))
+BEGIN
+    SELECT LastName, FirstName
+    INTO lastName, firstName
+    FROM Customer
+    WHERE LastName = lastName;
+END</programlisting>
+    <para>If you want to use a Callable Statement outside a Stored Procedure in Java, then you should use <xref linkend="sql_inj_prepared_statement"/> instead.</para>
+  </section>
+  <section id="sql_inj_parameterized_query" xreflabel="Parameterized Queries">
     <title>Parameterized Queries</title>
     <!-- https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand.parameters -->
     <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm><indexterm><primary>ParameterizedQuery</primary></indexterm>Parameterized Queries are used in .Net as the primary defense against SQL injections. A <systemitem>SqlCommand</systemitem> is a precompiled SQL statement with named parameters for attacker controlled data.</para>
-    <para>An example of a Prepared Statement is shown below. The Microsoft .NET Framework Data Provider for SQL Server does not support the question mark (<systemitem>?</systemitem>) placeholder for passing parameters to a SQL Statement or a stored procedure called by a command of <systemitem>CommandType.Text</systemitem>. A named parameter must be used instead.</para>
+    <para>An example of a Parameterized Query is shown below. The Microsoft .NET Framework Data Provider for SQL Server does not support the question mark (<systemitem>?</systemitem>) placeholder for passing parameters to a SQL Statement or a stored procedure called by a command of <systemitem>CommandType.Text</systemitem>. A named parameter must be used instead.</para>
     <example id="sql_inj_ex_parameterized_query_dotnet">
       <title>Parameterized Query, .Net</title>
-      <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
-String query = "SELECT balance FROM userdata WHERE username = @UNAME";
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = @LNAME";
 
 SqlCommand command = new SqlCommand(query, connection);
-command.Parameters.Add("@UNAME", SqlDbType.Text);
-command.Parameters["@UNAME"].Value = custName;
+command.Parameters.Add("@LNAME", SqlDbType.Text);
+command.Parameters["@LNAME"].Value = lastName;
 
 ResultSet results = command.executeQuery( );</programlisting>
     </example>
@@ -85,7 +168,7 @@ ResultSet results = command.executeQuery( );</programlisting>
   </section>
   <section id="sql_inj_dynamic_binding">
     <title>Dynamic Query</title>
-    <para>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than compile time. Dynamic queries select the table name or column name at runtime using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name at runtime using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
     <para/>
     <para>Your primary defense in dynamic query is to avoid the technique in the first place.</para>
   </section>
