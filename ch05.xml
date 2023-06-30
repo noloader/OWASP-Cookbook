@@ -40,7 +40,7 @@
   <section id="sql_inj_prepared_statement">
     <title>Prepared Statements</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm><indexterm><primary>PreparedStatement</primary></indexterm>Prepared Statements are used in Java as the primary defense against SQL injections. A <systemitem>PreparedStatement</systemitem> is a precompiled SQL statement with placeholders for attacker controlled data. Java uses the question mark (<systemitem>?</systemitem>) as a placeholder for the user supplied data.</para>
-    <para>An example of a vulnerable query is shown below.</para>
+    <para>An example of a vulnerable query is shown below. The code is vulnerable due to concatenation without a mitigation.</para>
     <example id="sql_inj_ex_prepared_statement_java_bad">
       <title>Prepared Statement, Java, Pwned</title>
       <programlisting><?code-font-size 75% ?>String custName = request.getParameter("customerName");
