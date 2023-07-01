@@ -12,8 +12,8 @@
   </section>
   <section id="sql_inj_strategy">
     <title>Strategy</title>
-    <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Prepared Statements or Parameterized Queries. Prepared Statements and Parameterized Queries keep code and data separate to ensure attacker supplied data is not interpreted as code by the underlying database engine.</para>
-    <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should use Prepared Statements or Parameterized Queries.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Prepared Statements or Parameterized Queries. Prepared Statements and Parameterized Queries bind user data in bind variables. Once bound, the underlying database engine will not unintentionally execute the user supplied data as code.</para>
+    <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should bind the user supplied data using Prepared Statements or Parameterized Queries.</para>
     <para>Encoding translates dangerous characters into a benign representations for storage in a database. The table below shows safe ways to encode dangerous characters.</para>
     <table frame="all">
       <title>Safe Encoding of Dangerous SQL Characters</title>
