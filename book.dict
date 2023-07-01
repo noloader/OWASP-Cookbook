@@ -60,6 +60,7 @@ untrusted
 Untrusted
 
 webapp
+schemas
 logfile
 dataflow
 dataflows
@@ -119,3 +120,4 @@ getCustomerName
 
 firstName
 lastName
+tableName
