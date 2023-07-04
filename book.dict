@@ -104,6 +104,15 @@ CallableStatement
 CommandType
 ParameterizedQuery
 SqlCommand
+EntityCommand
+EntityParameter
+OdbcCommand
+OdbcParameter
+OleDbCommand
+OleDbParameter
+OracleClient
+SqliteCommand
+SqliteParameter
 
 encodeForDN
 encodeAsterisk
