@@ -8,6 +8,8 @@
     <para><indexterm><primary>SQL Injection</primary><secondary>Documentation</secondary></indexterm><indexterm><primary>SQL Injection</primary><secondary>PreparedStatement</secondary></indexterm>Documentation for Java <systemitem>PreparedStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/index.html?java/sql/PreparedStatement.html">Interface PreparedStatement</ulink>.</para>
     <para><indexterm><primary>SQL Injection</primary><secondary>CallableStatement</secondary></indexterm>Documentation for Java <systemitem>CallableStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/java/sql/CallableStatement.html">Interface CallableStatement</ulink>.</para>
     <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm>Documentation for .Net <systemitem>SqlCommand</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand">SqlCommand Class</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>OleDbCommand</secondary></indexterm>Documentation for .Net <systemitem>OleDbCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbcommand">OleDbCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.odbc.odbcparameter">OdbcParameter Class</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>OdbcCommand</secondary></indexterm>Documentation for .Net <systemitem>OdbcCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.odbc.odbccommand">OdbcCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbparameter">OdbcCommand Class</ulink>.</para>
     <para>OWASP provides a SQL Injection cheat sheet at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">SQL Injection Prevention Cheat Sheet</ulink>.</para>
   </section>
   <section id="sql_inj_strategy">
@@ -184,13 +186,55 @@ BEGIN
 END</programlisting>
     <para>If you want to use a Callable Statement outside a Stored Procedure in Java, then you should use <xref linkend="sql_inj_prepared_statement"/> instead.</para>
   </section>
+  <!-- Parameterized Query -->
   <section id="sql_inj_parameterized_query" xreflabel="Parameterized Queries">
     <title>Parameterized Queries</title>
+    <!-- https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/ado-net-code-examples -->
+    <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm><indexterm><primary>ParameterizedQuery</primary></indexterm>Parameterized Queries are used in .Net as the primary defense against SQL injections. .Net provides multiple classes of interest for Parameterized Queries based on data source providers. The classes include <systemitem>SqlCommand</systemitem>, <systemitem>OleDbCommand</systemitem>, <systemitem>OdbcCommand</systemitem>, <systemitem>EntityCommand</systemitem> and <systemitem>SqliteCommand</systemitem>. An additional data source, <systemitem>OracleClient</systemitem>, is deprecated.</para>
+    <para>Whether a class supports placeholders depends on the data source provider. The table below shows data source providers and whether it supports placeholders. Also see <ulink url="https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/configuring-parameters-and-parameter-data-types">Working with parameter placeholders</ulink>.</para>
+    <table frame="all">
+      <title>Syntax for Parameter Placeholders </title>
+      <tgroup cols="2" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="provider" colwidth="2*"/>
+        <colspec colnum="2" colname="syntax" colwidth="3*"/>
+        <thead>
+          <row>
+            <entry>Data provider</entry>
+            <entry>Naming Syntax</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>System.Data.SqlClient</entry>
+            <entry>Named parameters in the format <systemitem>@paramname</systemitem></entry>
+          </row>
+          <row>
+            <entry>System.Data.OleDb</entry>
+            <entry>Positional parameter markers indicated by a <systemitem>?</systemitem> (question mark)</entry>
+          </row>
+          <row>
+            <entry>System.Data.Odbc</entry>
+            <entry>Positional parameter markers indicated by a <systemitem>?</systemitem> (question mark)</entry>
+          </row>
+          <row>
+            <entry>System.Data.EntityClient</entry>
+            <entry>Named parameters in the format <systemitem>@paramname</systemitem></entry>
+          </row>
+          <row>
+            <entry>Microsoft.Data.Sqlite</entry>
+            <entry>Named parameters in the format <systemitem>@paramname</systemitem></entry>
+          </row>
+          <row>
+            <entry>System.Data.OracleClient</entry>
+            <entry>Named parameters in the format <systemitem>:paramname</systemitem></entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+    <para><indexterm><primary>SQL Injection</primary><secondary>SqlCommand</secondary></indexterm><indexterm><primary>SqlCommand</primary></indexterm>A <systemitem>SqlCommand</systemitem> is a precompiled SQL statement which uses named parameters for attacker controlled data. An example of a Parameterized Query is shown below.</para>
     <!-- https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand.parameters -->
-    <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm><indexterm><primary>ParameterizedQuery</primary></indexterm>Parameterized Queries are used in .Net as the primary defense against SQL injections. A <systemitem>SqlCommand</systemitem> is a precompiled SQL statement with named parameters for attacker controlled data.</para>
-    <para>An example of a Parameterized Query is shown below. The Microsoft .NET Framework Data Provider for SQL Server does not support the question mark (<systemitem>?</systemitem>) placeholder for passing parameters to a SQL Statement or a stored procedure called by a command of <systemitem>CommandType.Text</systemitem>. A named parameter must be used instead.</para>
     <example id="sql_inj_ex_parameterized_query_dotnet">
-      <title>Parameterized Query, .Net</title>
+      <title>Parameterized Query, SqlCommand, .Net</title>
       <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
 String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = @LNAME";
 
@@ -199,6 +243,51 @@ command.Parameters.Add("@LNAME", SqlDbType.Text);
 command.Parameters["@LNAME"].Value = lastName;
 
 ResultSet results = command.executeQuery( );</programlisting>
+    </example>
+    <para><indexterm><primary>SQL Injection</primary><secondary>OleDbCommand</secondary></indexterm><indexterm><primary>OleDbCommand</primary></indexterm><indexterm><primary>SQL Injection</primary><secondary>OleDbParameter</secondary></indexterm><indexterm><primary>OleDbParameter</primary></indexterm>You can also use <systemitem>OleDbCommand</systemitem> to bind parameters in .Net. The code below shows an example of using <systemitem>OleDbCommand</systemitem> and <systemitem>OleDbParameter</systemitem>.</para>
+    <!-- https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbparameter -->
+    <example id="sql_inj_ex_oledb_command_dotnet">
+      <title>Parameterized Query, OleDbCommand, .Net</title>
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = ?";
+
+OleDbCommand command = new OleDbCommand(query, connection);
+command.Parameters.Add("@p1", SqlDbType.Text);
+command.Parameters["@p1"].Value = lastName;
+
+OleDbDataReader results = command.executeQuery( );</programlisting>
+    </example>
+    <para><indexterm><primary>SQL Injection</primary><secondary>EntityCommand</secondary></indexterm><indexterm><primary>EntityCommand</primary></indexterm><indexterm><primary>SQL Injection</primary><secondary>EntityParameter</secondary></indexterm><indexterm><primary>EntityParameter</primary></indexterm>You can also use <systemitem>EntityCommand</systemitem> to bind parameters in .Net. The code below shows an example of using <systemitem>EntityCommand</systemitem> and <systemitem>EntityParameter</systemitem>.</para>
+    <!-- https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/ef/how-to-execute-a-parameterized-entity-sql-query-using-entitycommand -->
+    <example id="sql_inj_ex_entity_command_dotnet">
+      <title>Parameterized Query, EntityCommand, .Net</title>
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = @LNAME";
+
+EntityParameter param = new EntityParameter();
+param.ParameterName = "LNAME";
+param.Value = lastName;
+
+EntityCommand command =  new EntityCommand(query, connection);
+command.Parameters.Add(param);
+
+EntityDataReader results = command.executeReader( );</programlisting>
+    </example>
+    <para><indexterm><primary>SQL Injection</primary><secondary>SqliteCommand</secondary></indexterm><indexterm><primary>SqliteCommand</primary></indexterm><indexterm><primary>SQL Injection</primary><secondary>SqliteParameter</secondary></indexterm><indexterm><primary>SqliteParameter</primary></indexterm>You can also use <systemitem>SqliteCommand</systemitem> to bind parameters in .Net. The code below shows an example of using <systemitem>SqliteCommand</systemitem> and <systemitem>SqliteParameter</systemitem>.</para>
+    <!-- https://learn.microsoft.com/en-us/dotnet/framework/data/adonet/ef/how-to-execute-a-parameterized-entity-sql-query-using-entitycommand -->
+    <example id="sql_inj_ex_sqlite_command_dotnet">
+      <title>Parameterized Query, SqliteCommand, .Net</title>
+      <programlisting><?code-font-size 75% ?>String lastName = request.getParameter("lastName");
+String query = "SELECT FirstName,LastName FROM Customer WHERE LastName = @LNAME";
+
+SqliteParameter param = new SqliteParameter();
+param.ParameterName = "LNAME";
+param.Value = lastName;
+
+SqliteCommand command =  new SqliteCommand(query, connection);
+command.Parameters.Add(param);
+
+SqliteDataReader results = command.executeReader( );</programlisting>
     </example>
   </section>
   <section id="sql_inj_encoding">
