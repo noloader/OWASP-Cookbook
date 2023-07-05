@@ -6,7 +6,7 @@
   <section id="xss_documentation" xreflabel="Encoder Documentation">
     <title>Documentation</title>
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>Documentation</secondary></indexterm><indexterm><primary>XSS</primary><secondary>Documentation</secondary></indexterm>Documentation for OWASP <systemitem>Encoder</systemitem> class is located at <ulink url="https://javadoc.io/static/org.owasp.encoder/encoder/1.2.3/index.html?org/owasp/encoder/Encoder.html">Class Encoder</ulink>. Documentation for ESAPI <systemitem>Encoder</systemitem> class is located at <ulink url="https://www.javadoc.io/static/org.owasp.esapi/esapi/2.5.2.0/index.html?org/owasp/esapi/Encoder.html">Interface Encoder</ulink>.</para>
-    <para>OWASP provides a SQL Injection cheat sheet at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">Cross Site Scripting Prevention Cheat Sheet</ulink>.</para>
+    <para>OWASP provides two XSS cheat sheets at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">Cross Site Scripting Prevention Cheat Sheet</ulink> and <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html">DOM based XSS Prevention Cheat Sheet</ulink>.</para>
   </section>
   <section id="xss_strategy">
     <title>Strategy</title>
