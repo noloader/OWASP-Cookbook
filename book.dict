@@ -2,6 +2,9 @@ RFC
 IETF
 W3C
 
+Base32
+Base64
+
 Chinook
 Northwind
 
@@ -120,6 +123,7 @@ encodeAsterisk
 encodeForLDAP
 encodeForLDAPFilter
 encodeForLDAPSearch
+validateTableName
 
 searchFilter
 distinguishedName
@@ -131,6 +135,14 @@ getParameter
 paramname
 queryId
 
+column1
+column2
+InvoiceLine
+XU746BVVA7VXCBOZ7JZA
+
 firstName
+FirstName
 lastName
+LastName
 tableName
+TableName
