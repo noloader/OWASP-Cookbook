@@ -28,6 +28,7 @@ CPU
 CPUs
 ISA
 ISAs
+args
 
 OWASP
 owasp
@@ -126,6 +127,9 @@ distinguishedName
 isValidLDAPString
 isValidLDAPSearchString
 getCustomerName
+getParameter
+paramname
+queryId
 
 firstName
 lastName
