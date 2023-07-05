@@ -45,7 +45,7 @@
   <section id="sql_inj_chinook_db" xreflabel="Chinook Database">
     <title>Chinook Database</title>
     <para><indexterm><primary>Chinook</primary></indexterm><ulink url="https://github.com/lerocha/chinook-database">The Chinook database</ulink> is a sample database available for SQL Server, Oracle, MySQL, and SQLite. Chinook is the free/open source software equivalent to Microsoft's Northwind database.</para>
-    <para>The Chinook database is used in the samples for this chapter. A partial output of Chinook's table schema is reproduced below. Notice the <systemitem>Customer</systemitem> and <systemitem>Employee</systemitem> table schemas are similar. The similarity will be abused later under <xref linkend="sql_inj_dynamic_binding"/>.</para>
+    <para>The Chinook database is used in the samples for this chapter. A partial output of Chinook's table schema is reproduced below. Notice the <systemitem>Customer</systemitem> and <systemitem>Employee</systemitem> table schemas are similar. The similarity will be abused later under <xref linkend="sql_inj_dynamic_query"/>.</para>
     <example id="sql_inj_chinook_schema" xreflabel="Chinook Database Schema">
       <title>Chinook Database Schema</title>
       <programlisting><?code-font-size 75% ?>$ sqlite3 Chinook.sqlite
@@ -160,7 +160,7 @@ command.setString(1, lastName);
 
 ResultSet results = command.executeQuery( );</programlisting>
     </example>
-    <para>The problem with <xref linkend="sql_inj_ex_prepared_statement_java_bad"/> is, <systemitem>tableName</systemitem> is not bound in the Prepared Statement. Rather, it is concatenated like in <xref linkend="sql_inj_ex_vulnerable_query"/>. In fact, the variable <systemitem>tableName</systemitem> cannot be bound because table names and column names cannot be bound. The problem is discussed in detail in <xref linkend="sql_inj_dynamic_binding"/>.</para>
+    <para>The problem with <xref linkend="sql_inj_ex_prepared_statement_java_bad"/> is, <systemitem>tableName</systemitem> is not bound in the Prepared Statement. Rather, it is concatenated like in <xref linkend="sql_inj_ex_vulnerable_query"/>. In fact, the variable <systemitem>tableName</systemitem> cannot be bound because table names and column names cannot be bound. The problem is discussed in detail in <xref linkend="sql_inj_dynamic_query"/>.</para>
   </section>
   <section id="sql_inj_callable_statement" xreflabel="Callable Statements">
     <title>Callable Statements</title>
@@ -296,36 +296,39 @@ SqliteDataReader results = command.executeReader( );</programlisting>
     <title>Encoding</title>
     <para>.</para>
   </section>
-  <section id="sql_inj_dynamic_binding">
+  <section id="sql_inj_dynamic_query">
     <title>Dynamic Query</title>
-    <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name and incorporate it using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using static queries declared at compile time. Dynamic queries select the table names or column names and incorporate them using concatenation to build the SQL query at runtime. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
     <para>Your primary defense in dynamic query is to avoid the technique in the first place. You should redesign your program and avoid the dynamic query.</para>
-    <para>A webapp that builds a dynamic query on a table name at runtime might look like below.</para>
+    <para>An application that builds a dynamic query on a table name and column names at runtime might look like below.</para>
     <example id="sql_inj_ex_dyn_query_bad_1">
       <title>Dynamic Query, Table Name, Pwned</title>
       <programlisting><?code-font-size 75% ?>String tableName = request.getParameter("tableName");
-String lastName = request.getParameter("lastName");
+String column1 = request.getParameter("column1");
+String column2 = request.getParameter("column2");
+String search = request.getParameter("search");
 
 Connection connection = DriverManager.getConnection("jdbc:sqlite:Chinook.sqlite");
-String query = "SELECT FirstName,LastName FROM " + tableName +
-               " WHERE LastName LIKE '" + lastName + "%'";
+String query = "SELECT " + column1 + "," + column2 + " FROM " + tableName +
+               " WHERE " + column2 + " LIKE '" + search + "%'";
 
 Statement statement = connection.createStatement();
 ResultSet results = statement.executeQuery(query);
 
 while (results.next())
 {
-    System.out.println(results.getString("FirstName") + " " +
-                       results.getString("LastName"));
+    System.out.println(results.getString(column1) + " " +
+                       results.getString(column2));
 }</programlisting>
     </example>
-    <para>The program allows the user to match an exact Customer last name (like "Brooks") or a stem (like "Br*"). Running the program from the command line results in output shown below. (The command line version uses <systemitem>args[0]</systemitem> and <systemitem>args[1]</systemitem> instead of <systemitem>request.getParameter(paramname)</systemitem>).</para>
-    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Customer Br
+    <para>The program allows the user to match an exact Customer last name (like "Brooks") or a stem (like "Br*"). And suppose the app uses a URI similar to <systemitem>https://www.example.com/query?tableName=Customer&amp;column1=FirstName&amp;column2=LastName&amp;search=Br</systemitem>.</para>
+    <para>Running the program from the command line results in output shown below. The command line version uses <systemitem>args[0]</systemitem> and <systemitem>args[1]</systemitem> instead of <systemitem>request.getParameter(paramname)</systemitem>.</para>
+    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Customer FirstName LastName Br
 List of Customers matching Br*
 Michelle Brooks
 Robert Brown</programlisting>
-    <para>Now a clever attacker can take advantage of the web app, and use Employee table instead of the Customer name. Additionally, the attacker can use an underscore character (<systemitem>_</systemitem>) to match any character in the first position. The result of an attack would reveal all company employees in the database.</para>
-    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
+    <para>A clever attacker can take advantage of the dynamic query, and use Employee table instead of the Customer table. Additionally, the attacker can use an underscore character (<systemitem>_</systemitem>) to match any character in the first position. The result of an attack would reveal all company employees in the database.</para>
+    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee FirstName LastName _
 List of Employees matching _*
 Andrew Adams
 Nancy Edwards
@@ -335,7 +338,7 @@ Steve Johnson
 Michael Mitchell
 Robert King
 Laura Callahan</programlisting>
-    <para>A defense when using dynamic queries on table names and column names is validation, and it is a weak security control at best. Adding a validation method may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries with concatenation. Other attacks will exist.</para>
+    <para>A defense when using dynamic queries on table names and column names is validation, but it is a weak security control at best. Adding a validation method to filter-out table names with 'Employee' may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries.</para>
     <programlisting><?code-font-size 75% ?>protected static String validateTableName(String tableName)
 {
     final String validTableNames[] = {
@@ -349,14 +352,14 @@ Laura Callahan</programlisting>
     return tableName;
 }</programlisting>
     <para>Running the program with the validator will result in an exception if an attacker attempts to use the Employee table.</para>
-    <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
+    <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee FirstName LastName _
 java.lang.IllegalArgumentException: Table name Employee is not valid</programlisting>
-    <para>If the program is changed so that both the table name and column names are selected at runtime, then the validation shown above is incomplete. A program will have to track valid table names and the valid column names that should be used with a particular table name. It does not scale, and it is a losing battle.</para>
-    <para>The complete solution is to statically declare the query and then use a Prepared Statement or Parameterized Query on the user input. The modified program is shown below, and it uses <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement. That is, instead of sending the table name to the client in a response, reading the table name back at the server in a request, and then executing a query on it, the program keeps the parameters local to the server and only sends a <systemitem>queryId</systemitem>. In the modified case, the attacker never controls the table name, and the values the attacker controls are safe guarded in a Prepared Statement.</para>
+    <para>Unfortunately, <systemitem>validateTableName</systemitem> will be an incomplete remediation because it continues to allow other restricted table names, like  Invoice and InvoiceLine. The complete solution is to statically declare the query and use a Prepared Statement or Parameterized Query to bind the user input.</para>
+    <para>A modified program is shown below, and it uses <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement. The the app uses a URI similar to <systemitem>https://www.example.com/query?queryId=XU746BVVA7VXCBOZ7JZA&amp;search=Br</systemitem>. The queries are statically declared, the attacker never controls the table name or column names, and the values the attacker controls are bound in a Prepared Statement.</para>
     <example id="sql_inj_ex_dyn_query_ok">
       <title>Dynamic Query, Prepared Statement</title>
       <programlisting><?code-font-size 75% ?>String queryId = request.getParameter("queryId");
-String lastName = request.getParameter("lastName");
+String search = request.getParameter("search");
 
 Connection connection = DriverManager.getConnection("jdbc:sqlite:Chinook.sqlite");
 PreparedStatement statement = null;
@@ -366,7 +369,7 @@ switch (queryId)
     case "XU746BVVA7VXCBOZ7JZA":
         String query = "SELECT FirstName,LastName FROM Customer WHERE LastName LIKE ?";
         statement = connection.prepareStatement(query);
-        statement.setString(1, lastName+"%");
+        statement.setString(1, search+"%");
         break;
     default:
         throw new IllegalArgumentException("Query Id " + queryId + " is not valid");
