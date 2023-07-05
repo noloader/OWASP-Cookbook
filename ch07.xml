@@ -10,7 +10,7 @@
   </section>
   <section id="xml_inj_strategy">
     <title>Strategy</title>
-    <para><indexterm><primary>XML Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against XML Injections in is encoding problematic characters.</para>
+    <para><indexterm><primary>XML Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against XML Injections in is encoding problematic characters in entity values.</para>
     <para>.</para>
     <table frame="all" id="xml_table_chars">
       <title>Encoding of XML Distinguished Name Characters</title>
@@ -32,124 +32,31 @@
             <entry>NUL</entry>
             <entry>\00</entry>
             <entry>None</entry>
-            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+            <entry>.</entry>
           </row>
           <row>
             <entry>SPACE</entry>
             <entry>\20</entry>
             <entry>\SPACE</entry>
-            <entry>Not in LUTF1 or TUTF1</entry>
+            <entry>.</entry>
           </row>
           <row>
             <entry>"</entry>
             <entry>\22</entry>
             <entry>\"</entry>
-            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
+            <entry>.</entry>
           </row>
           <row>
             <entry>#</entry>
             <entry>\23</entry>
             <entry>\#</entry>
-            <entry>Not in LUTF1</entry>
+            <entry>.</entry>
           </row>
           <row>
             <entry>+</entry>
             <entry>\2B</entry>
             <entry>\+</entry>
-            <entry>Not in LUTF1, SUTF1 or TUTF1</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
-    <para>For search filter strings, the characters are provided in the grammar shown in <ulink url="https://tools.ietf.org/html/rfc4515#section-3">RFC 4515, Section 3</ulink>. The table below shows the characters and how to encode them for the directory. <indexterm><primary>UTF1SUBSET</primary></indexterm><indexterm><primary>XML Injection</primary><secondary>UTF1SUBSET</secondary></indexterm><systemitem>UTF1SUBSET</systemitem> is the subset of UTF-8 characters specified by RFC 4515.</para>
-    <table frame="all" id="xml_table_filter_chars">
-      <title>Encoding of XML Filter Characters</title>
-      <tgroup cols="3" align="center" colsep="1" rowsep="1">
-        <colspec colnum="1" colname="character" colwidth="1*"/>
-        <colspec colnum="2" colname="encoding" colwidth="1*"/>
-        <colspec colnum="3" colname="comment" colwidth="2*"/>
-        <thead>
-          <row>
-            <entry>Character</entry>
-            <entry>Encoding</entry>
-            <entry>Comment</entry>
-          </row>
-        </thead>
-        <tbody>
-          <row>
-            <entry>NUL</entry>
-            <entry>\00</entry>
-            <entry>Not in UTF1SUBSET</entry>
-          </row>
-          <row>
-            <entry>!</entry>
-            <entry>\21</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>&amp;</entry>
-            <entry>\26</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>(</entry>
-            <entry>\28</entry>
-            <entry>Not in UTF1SUBSET</entry>
-          </row>
-          <row>
-            <entry>)</entry>
-            <entry>\29</entry>
-            <entry>Not in UTF1SUBSET</entry>
-          </row>
-          <row>
-            <entry>*</entry>
-            <entry>\2A</entry>
-            <entry>Not in UTF1SUBSET</entry>
-          </row>
-          <row>
-            <entry>/</entry>
-            <entry>\2F</entry>
-            <entry>Required by Microsoft AD</entry>
-          </row>
-          <row>
-            <entry>:</entry>
-            <entry>\3A</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>&lt;</entry>
-            <entry>\3C</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>=</entry>
-            <entry>\3D</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>&gt;</entry>
-            <entry>\3E</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>ESC</entry>
-            <entry>\5C</entry>
-            <entry>Not in UTF1SUBSET</entry>
-          </row>
-          <row>
-            <entry>|</entry>
-            <entry>\7C</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>~</entry>
-            <entry>\7E</entry>
-            <entry>Used in Filter grammar</entry>
-          </row>
-          <row>
-            <entry>0x80-0xFFFF</entry>
-            <entry>\hh</entry>
-            <entry>Hexadecimal encoded, 2 digits<footnote><para>The character is first converted to a UTF-8 multibyte sequence, then each byte is hexadecimal encoded.</para></footnote></entry>
+            <entry>.</entry>
           </row>
         </tbody>
       </tgroup>
