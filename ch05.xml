@@ -300,7 +300,7 @@ SqliteDataReader results = command.executeReader( );</programlisting>
     <title>Dynamic Query</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name and incorproate it using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
     <para>Your primary defense in dynamic query is to avoid the technique in the first place. You should redesign your program and avoid the dynamic query.</para>
-    <para>A webapp thatbuilds a dynamic query on a table name at runtime might look like below.</para>
+    <para>A webapp that builds a dynamic query on a table name at runtime might look like below.</para>
     <example id="sql_inj_ex_dyn_query_bad_1">
       <title>Dynamic Query, Table Name, Pwned</title>
       <programlisting><?code-font-size 75% ?>String tableName = request.getParameter("tableName");
@@ -335,7 +335,7 @@ Steve Johnson
 Michael Mitchell
 Robert King
 Laura Callahan</programlisting>
-    <para>The primary defense when using dynamic queries with concatenation is validation, and it is a weak security control at best. Adding a validation method may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries with concatenation. Other attacks will exist.</para>
+    <para>A defense when using dynamic queries on table names and column names is validation, and it is a weak security control at best. Adding a validation method may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries with concatenation. Other attacks will exist.</para>
     <programlisting><?code-font-size 75% ?>protected static String validateTableName(String tableName)
 {
     final String validTableNames[] = {
