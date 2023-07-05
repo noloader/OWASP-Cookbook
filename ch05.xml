@@ -298,7 +298,7 @@ SqliteDataReader results = command.executeReader( );</programlisting>
   </section>
   <section id="sql_inj_dynamic_binding">
     <title>Dynamic Query</title>
-    <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name and incorproate it using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name and incorporate it using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
     <para>Your primary defense in dynamic query is to avoid the technique in the first place. You should redesign your program and avoid the dynamic query.</para>
     <para>A webapp that builds a dynamic query on a table name at runtime might look like below.</para>
     <example id="sql_inj_ex_dyn_query_bad_1">
@@ -351,6 +351,7 @@ Laura Callahan</programlisting>
     <para>Running the program with the validator will result in an exception if an attacker attempts to use the Employee table.</para>
     <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
 java.lang.IllegalArgumentException: Table name Employee is not valid</programlisting>
+    <para>If the program is changed so that both the table name and column names are selected at runtime, then the validation shown above is incomplete. A program will have to track valid table names and the valid column names that should be used with a particular table name. It does not scale, and it is a losing battle.</para>
     <para>The complete solution is to statically declare the query and then use a Prepared Statement or Parameterized Query on the user input. The modified program is shown below, and it uses <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement. That is, instead of sending the table name to the client in a response, reading the table name back at the server in a request, and then executing a query on it, the program keeps the parameters local to the server and only sends a <systemitem>queryId</systemitem>. In the modified case, the attacker never controls the table name, and the values the attacker controls are safe guarded in a Prepared Statement.</para>
     <example id="sql_inj_ex_dyn_query_ok">
       <title>Dynamic Query, Prepared Statement</title>
@@ -374,7 +375,7 @@ switch (queryId)
 ResultSet results = statement.executeQuery();
 </programlisting>
     </example>
-    <para>One final note, the <systemitem>queryId</systemitem> is a 12-byte or 96-bit random value from a uniform distribution. It was generated from <systemitem>/dev/urandom</systemitem>. The string is not case sensitive because it used the Base32 alphabet.</para>
+    <para>One final note, the <systemitem>queryId</systemitem> is a 12-byte or 96-bit random value from a uniform distribution. The <systemitem>queryId</systemitem> was generated from <systemitem>/dev/urandom</systemitem>. The string is not case sensitive because it uses the Base32 alphabet.</para>
     <programlisting><?code-font-size 75% ?>$ head -c 12 /dev/urandom | base32 | sed 's/=//g'
 XU746BVVA7VXCBOZ7JZA</programlisting>
   </section>
