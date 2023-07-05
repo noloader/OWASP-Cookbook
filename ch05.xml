@@ -338,7 +338,7 @@ Steve Johnson
 Michael Mitchell
 Robert King
 Laura Callahan</programlisting>
-    <para>A defense when using dynamic queries on table names and column names is validation, but it is a weak security control at best. Adding a validation method to filter-out table names with 'Employee' may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries.</para>
+    <para>A defense when using dynamic queries on table names and column names is validation, but it is a weak security control at best. Adding a validation method to filter-out table names with Employee may fix this particular instance problem, but it does not address the class of problems caused by dynamic queries.</para>
     <programlisting><?code-font-size 75% ?>protected static String validateTableName(String tableName)
 {
     final String validTableNames[] = {
@@ -364,7 +364,7 @@ String search = request.getParameter("search");
 Connection connection = DriverManager.getConnection("jdbc:sqlite:Chinook.sqlite");
 PreparedStatement statement = null;
 
-switch (queryId)
+switch (queryId.toUpperCase())
 {
     case "XU746BVVA7VXCBOZ7JZA":
         String query = "SELECT FirstName,LastName FROM Customer WHERE LastName LIKE ?";
