@@ -18,29 +18,7 @@
     <title>Strategy</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against SQL Injections are Prepared Statements or Parameterized Queries. Prepared Statements and Parameterized Queries bind user data in <indexterm><primary>SQL Injection</primary><secondary>Bind variables</secondary></indexterm><indexterm><primary>Bind variables</primary></indexterm>bind variables. Once bound, the underlying database engine will not unintentionally execute the user supplied data as code.<footnote><para>Bind variables can make the code execute faster by reducing queries in the cache. Also see <ulink url="https://blogs.oracle.com/sql/post/improve-sql-query-performance-by-using-bind-variables">Improve SQL Query Performance by Using Bind Variables</ulink></para></footnote></para>
     <para>A secondary defense against SQL Injections is encoding dangerous characters so the attacker supplied data is not interpreted as code by the underlying database engine. Encoding is an anti-pattern and should not be used. Instead, you should bind the user supplied data using Prepared Statements or Parameterized Queries.</para>
-    <para>Encoding translates dangerous characters into a benign representations for storage in a database. The table below shows safe ways to encode dangerous characters.</para>
-    <table frame="all">
-      <title>Safe Encoding of Dangerous SQL Characters</title>
-      <tgroup cols="3" align="center" colsep="1" rowsep="1">
-        <colspec colnum="1" colname="character" colwidth="1*"/>
-        <colspec colnum="2" colname="encoding" colwidth="1*"/>
-        <colspec colnum="3" colname="comment" colwidth="1*"/>
-        <thead>
-          <row>
-            <entry>Character</entry>
-            <entry>Encoding</entry>
-            <entry>Comment</entry>
-          </row>
-        </thead>
-        <tbody>
-          <row>
-            <entry>' (single quote)</entry>
-            <entry>''</entry>
-            <entry>Single quote espaced with a single quote</entry>
-          </row>
-        </tbody>
-      </tgroup>
-    </table>
+    <para>Dynamic Queries are dangerous. Dynamic queries often place critical parameters, like table names and column names, in the attacker's control. Additionally, table names and column names cannot be bound using Prepared Statements or Parameterized Queries. You should avoid dynamic queries since it is difficult to use them safely.</para>
   </section>
   <section id="sql_inj_chinook_db" xreflabel="Chinook Database">
     <title>Chinook Database</title>
@@ -294,7 +272,29 @@ SqliteDataReader results = command.executeReader( );</programlisting>
   </section>
   <section id="sql_inj_encoding">
     <title>Encoding</title>
-    <para>.</para>
+    <para>Encoding translates dangerous characters into a benign representations for storage in a database. The table below shows safe ways to encode dangerous characters.</para>
+    <table frame="all">
+      <title>Safe Encoding of Dangerous SQL Characters</title>
+      <tgroup cols="3" align="center" colsep="1" rowsep="1">
+        <colspec colnum="1" colname="character" colwidth="1*"/>
+        <colspec colnum="2" colname="encoding" colwidth="1*"/>
+        <colspec colnum="3" colname="comment" colwidth="1*"/>
+        <thead>
+          <row>
+            <entry>Character</entry>
+            <entry>Encoding</entry>
+            <entry>Comment</entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>' (single quote)</entry>
+            <entry>''</entry>
+            <entry>Single quote espaced with a single quote</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
   </section>
   <section id="sql_inj_dynamic_query">
     <title>Dynamic Query</title>
