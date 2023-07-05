@@ -351,7 +351,7 @@ Laura Callahan</programlisting>
     <para>Running the program with the validator will result in an exception if an attacker attempts to use the Employee table.</para>
     <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
 java.lang.IllegalArgumentException: Table name Employee is not valid</programlisting>
-    <para>The complete solution is to statically declare the query and then use a Prepared Statement or Parameterized Query on the user input. The modified program is shown below. The modified program uses a <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement.</para>
+    <para>The complete solution is to statically declare the query and then use a Prepared Statement or Parameterized Query on the user input. The modified program is shown below, and it uses <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement. That is, instead of sending the table name to the client in a response, reading the table name back at the server in a request, and then executing a query on it, the program keeps the parameters local to the server and only sends a <systemitem>queryId</systemitem>.</para>
     <example id="sql_inj_ex_dyn_query_ok">
       <title>Dynamic Query, Prepared Statement</title>
       <programlisting><?code-font-size 75% ?>String queryId = request.getParameter("queryId");
