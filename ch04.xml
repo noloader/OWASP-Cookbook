@@ -211,7 +211,7 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
   </section>
   <section id="xss_inner_html">
     <title>innerHTML</title>
-    <para><indexterm><primary>Cross Site Scripting</primary><secondary>innerHTML</secondary></indexterm><indexterm><primary>XSS</primary><secondary>innerHTML</secondary></indexterm>The primary defense against XSS in <systemitem>innerHTML</systemitem> is to avoid it and use <systemitem>innerText</systemitem>. If you must use <systemitem>innerHTML</systemitem>, then the defense is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in the <systemitem>innerHTML</systemitem>.</para>
+    <para><indexterm><primary>Cross Site Scripting</primary><secondary>innerHTML</secondary></indexterm><indexterm><primary>XSS</primary><secondary>innerHTML</secondary></indexterm>The primary defense against XSS in dangerous sinks like <systemitem>innerHTML</systemitem> is to avoid it and use a safe sink like <systemitem>textContent</systemitem> or <systemitem>innerText</systemitem>. If you must use <systemitem>innerHTML</systemitem>, then the defense is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in the <systemitem>innerHTML</systemitem>.</para>
     <para>Examples of encoding using various encoders are shown below.</para>
     <example id="xss_ex_inner_html_owasp">
       <title>innerHTML, OWASP Encoder</title>
