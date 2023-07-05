@@ -374,7 +374,7 @@ switch (queryId)
 ResultSet results = statement.executeQuery();
 </programlisting>
     </example>
-    <para>One final note, the <systemitem>queryId</systemitem> is a 12-byte or 96-bit random value from a uniform distribution. It was generated from <systemitem>/dev/urandom</systemitem>.</para>
+    <para>One final note, the <systemitem>queryId</systemitem> is a 12-byte or 96-bit random value from a uniform distribution. It was generated from <systemitem>/dev/urandom</systemitem>. The string is not case sensitive because it used the Base32 alphabet.</para>
     <programlisting><?code-font-size 75% ?>$ head -c 12 /dev/urandom | base32 | sed 's/=//g'
 XU746BVVA7VXCBOZ7JZA</programlisting>
   </section>
