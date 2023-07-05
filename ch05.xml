@@ -9,7 +9,9 @@
     <para><indexterm><primary>SQL Injection</primary><secondary>CallableStatement</secondary></indexterm>Documentation for Java <systemitem>CallableStatement</systemitem> class is located at <ulink url="https://docs.oracle.com/javase/8/docs/api/java/sql/CallableStatement.html">Interface CallableStatement</ulink>.</para>
     <para><indexterm><primary>SQL Injection</primary><secondary>ParameterizedQuery</secondary></indexterm>Documentation for .Net <systemitem>SqlCommand</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand">SqlCommand Class</ulink>.</para>
     <para><indexterm><primary>SQL Injection</primary><secondary>OleDbCommand</secondary></indexterm>Documentation for .Net <systemitem>OleDbCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbcommand">OleDbCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.odbc.odbcparameter">OdbcParameter Class</ulink>.</para>
-    <para><indexterm><primary>SQL Injection</primary><secondary>OdbcCommand</secondary></indexterm>Documentation for .Net <systemitem>OdbcCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.odbc.odbccommand">OdbcCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbparameter">OdbcCommand Class</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>OdbcCommand</secondary></indexterm>Documentation for .Net <systemitem>OdbcCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.odbc.odbccommand">OdbcCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.oledb.oledbparameter">OdbcParameter Class</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>EntityCommand</secondary></indexterm>Documentation for .Net <systemitem>EntityCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.entityclient.entitycommand">EntityCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/system.data.entityclient.entityparameter">EntityCommand Class</ulink>.</para>
+    <para><indexterm><primary>SQL Injection</primary><secondary>SqliteCommand</secondary></indexterm>Documentation for .Net <systemitem>SqliteCommand Class</systemitem> class is located at <ulink url="https://learn.microsoft.com/en-us/dotnet/api/microsoft.data.sqlite.sqlitecommand">SqliteCommand Class</ulink> and <ulink url="https://learn.microsoft.com/en-us/dotnet/api/microsoft.data.sqlite.sqliteparameter">SqliteCommand Class</ulink>.</para>
     <para>OWASP provides a SQL Injection cheat sheet at <ulink url="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html">SQL Injection Prevention Cheat Sheet</ulink>.</para>
   </section>
   <section id="sql_inj_strategy">
@@ -297,7 +299,84 @@ SqliteDataReader results = command.executeReader( );</programlisting>
   <section id="sql_inj_dynamic_binding">
     <title>Dynamic Query</title>
     <para><indexterm><primary>SQL Injection</primary><secondary>Dynamic Query</secondary></indexterm><indexterm><primary>Dynamic Query</primary></indexterm>Dynamic queries refers to the technique of selecting table names and column names at runtime rather than using a static query declared at compile time. Dynamic queries usually select the table name or column name at runtime using concatenation to build the SQL query. The problem with dynamic queries is, you cannot bind a table name or column name in a Prepared Statement or Parameterized Query.</para>
-    <para/>
-    <para>Your primary defense in dynamic query is to avoid the technique in the first place.</para>
+    <para>Your primary defense in dynamic query is to avoid the technique in the first place. You should redesign your program and avoid the dynamic query.</para>
+    <para>A webapp that attempts to bind to a table name at runtime might look like below.</para>
+    <example id="sql_inj_ex_dyn_query_bad_1">
+      <title>Dynamic Query, Table Name, Pwned</title>
+      <programlisting><?code-font-size 75% ?>String tableName = request.getParameter("tableName");
+String lastName = request.getParameter("lastName");
+
+Connection connection = DriverManager.getConnection("jdbc:sqlite:Chinook.sqlite");
+
+String query = "SELECT FirstName,LastName FROM " + tableName +
+               " WHERE LastName LIKE '" + lastName + "%'";
+
+Statement statement = connection.createStatement();
+ResultSet results = statement.executeQuery(query);
+
+while (results.next())
+{
+    System.out.println(results.getString("FirstName") + " " +
+                       results.getString("LastName"));
+}</programlisting>
+    </example>
+    <para>The program allows the user to match an exact Customer last name (like "Brooks") or a stem (like "Br*"). Running the program from the command line results in output shown below. (The command line version uses <systemitem>args[0]</systemitem> and <systemitem>args[1]</systemitem> instead of <systemitem>request.getParameter(paramname)</systemitem>).</para>
+    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Customer Br
+List of Customers matching Br*
+Michelle Brooks
+Robert Brown</programlisting>
+    <para>Now a clever attacker can take advantage of the web app, and use Employee table instead of the Customer name. Additionally, the attacker can use an underscore character (<systemitem>_</systemitem>) to match any character in the first position. The result of an attack would reveal all company employees in the database.</para>
+    <programlisting><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
+List of Employees matching _*
+Andrew Adams
+Nancy Edwards
+Jane Peacock
+Margaret Park
+Steve Johnson
+Michael Mitchell
+Robert King
+Laura Callahan</programlisting>
+    <para>The primary defense you have when using dynamic queries is validation, and it is a weak security control at best. Adding a validation method will fix this particular instance problem, but it does not address the class of problems caused by dynamic queries. Other attacks will exist.</para>
+    <programlisting><?code-font-size 75% ?>protected static String validateTableName(String tableName)
+{
+    final String validTableNames[] = {
+        "Album", "Artist", "Customer", "Genre", "Invoice", "InvoiceLine",
+        "MediaType", "Playlist", "PlaylistTrack", "Track"
+    };
+
+    if (Arrays.binarySearch(validTableNames, tableName) &lt; 0)
+        throw new IllegalArgumentException("Table name " + tableName + " is not valid");
+
+    return tableName;
+}</programlisting>
+    <para>Running the program with the validator will result in an exception if an attacker attempts to use the Employee table.</para>
+    <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee _
+java.lang.IllegalArgumentException: Table name Employee is not valid</programlisting>
+    <para>The complete solution is to statically declare the query and then use a Prepared Statement or Parameterized Query on the user input. The modified program is shown below. The modified program uses a <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement.</para>
+    <example id="sql_inj_ex_dyn_query_ok">
+      <title>Dynamic Query, Prepared Statement</title>
+      <programlisting><?code-font-size 75% ?>String queryId = request.getParameter("queryId");
+String lastName = request.getParameter("lastName");
+
+Connection connection = DriverManager.getConnection("jdbc:sqlite:Chinook.sqlite");
+PreparedStatement statement = null;
+
+switch (queryId)
+{
+    case "XU746BVVA7VXCBOZ7JZA":
+        String query = "SELECT FirstName,LastName FROM Customer WHERE LastName LIKE ?";
+        statement = connection.prepareStatement(query);
+        statement.setString(1, lastName+"%");
+        break;
+    default:
+        throw new IllegalArgumentException("Query Id " + queryId + " is not valid");
+}
+
+ResultSet results = statement.executeQuery();
+</programlisting>
+    </example>
+    <para>One final note, the <systemitem>queryId</systemitem> is a 12-byte or 96-bit random value from a uniform distribution. It was generated from <systemitem>/dev/urandom</systemitem>.</para>
+    <programlisting><?code-font-size 75% ?>$ head -c 12 /dev/urandom | base32 | sed 's/=//g'
+XU746BVVA7VXCBOZ7JZA</programlisting>
   </section>
 </chapter>
