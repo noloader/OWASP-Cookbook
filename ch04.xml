@@ -142,7 +142,7 @@ UNTRUSTED = ESAPI.encoder().canonicalize(UNTRUSTED);
 ...
 String encoded = ESAPI.encoder().encodeForURL(UNTRUSTED);</programlisting>
     </example>
-    <para>If you have to call <systemitem>canonicalize</systemitem> multiple times, then it could be an attacker supplying data already encoded to evade detection.</para>
+    <para>If you have to call <systemitem>canonicalize</systemitem> multiple times, then it could be an attacker supplying data already encoded to evade detection. If you find you need to call <systemitem>canonicalize</systemitem>, then consider returning an error. Don't allow an attacker to have multiple attempts on your code.</para>
   </section>
   <section id="xss_html">
     <title>HTML Body</title>
