@@ -11,7 +11,7 @@
   <section id="xml_inj_strategy">
     <title>Strategy</title>
     <para><indexterm><primary>XML Injection</primary><secondary>Strategy</secondary></indexterm>The primary defense against XML Injections in is encoding problematic characters in entity values.</para>
-    <para>.</para>
+    <!--
     <table frame="all" id="xml_table_chars">
       <title>Encoding of XML Distinguished Name Characters</title>
       <tgroup cols="4" align="center" colsep="1" rowsep="1">
@@ -61,5 +61,6 @@
         </tbody>
       </tgroup>
     </table>
+    -->
   </section>
 </chapter>
