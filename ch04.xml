@@ -132,6 +132,18 @@
       </tgroup>
     </table>
   </section>
+  <section id="xss_canonicalize">
+    <title>Canonicalization</title>
+    <para><indexterm><primary>Canonicalization</primary></indexterm>Sometimes you will need to use an ESAPI control on a value, but the value may already be encoded. To avoid double encoding you can call <systemitem>canonicalize</systemitem> to normalize a value before encoding.</para>
+    <example id="xss_ex_canonicalize_esapi">
+      <title>Canonicalization, ESAPI Encoder</title>
+      <programlisting><?code-font-size 75% ?>String UNTRUSTED = request.getParameter("SomeParameter");
+UNTRUSTED = ESAPI.encoder().canonicalize(UNTRUSTED);
+...
+String encoded = ESAPI.encoder().encodeForURL(UNTRUSTED);</programlisting>
+    </example>
+    <para>If you have to call <systemitem>canonicalize</systemitem> multiple times, then it could be an attacker supplying data already encoded to evade detection.</para>
+  </section>
   <section id="xss_html">
     <title>HTML Body</title>
     <para><indexterm><primary>Cross Site Scripting</primary><secondary>HTML Body</secondary></indexterm><indexterm><primary>XSS</primary><secondary>HTML Body</secondary></indexterm>The primary defense against XSS in HTML body is HTML escaping or Entity encoding. Use the encoding method when the attacker controlled text is displayed to the user in a &lt;body&gt; tag.</para>
@@ -187,8 +199,8 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
     </example>
     <para>Encoding can be used when the attacker controlled text is part of JavaScript. This remediation includes all DOM-based JavaScript event handler attributes such as <systemitem>onfocus</systemitem>, <systemitem>onclick</systemitem>, and <systemitem>onload</systemitem>.</para>
     <para>Examples of encoding using various encoders are shown below. Note that the developer must supply the quotes for the strings.</para>
-    <example id="xss_ex_js_html_attribute_owasp">
-      <title>JavaScript, HTML Attribute, OWASP Encoder</title>
+    <example id="xss_ex_js_event_owasp">
+      <title>JavaScript Event, OWASP Encoder</title>
       <programlisting><?code-font-size 75% ?>&lt;button onclick="alert('&lt;%=Encode.forJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
     <example id="xss_ex_js_block_owasp">
