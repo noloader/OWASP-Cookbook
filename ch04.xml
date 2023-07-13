@@ -209,8 +209,8 @@ $ESAPI.encoder().encodeForHTMLAttribute("&lt;h1&gt;Hello World!&lt;/h1&gt;");
    var msg = "&lt;%= Encode.forJavaScriptBlock(UNTRUSTED) %&gt;";
 &lt;/script&gt;</programlisting>
     </example>
-    <example id="xss_ex_js_html_attribute_esapi">
-      <title>JavaScript, HTML Attribute, ESAPI Encoder</title>
+    <example id="xss_ex_js_event_esapi">
+      <title>JavaScript Event, ESAPI Encoder</title>
       <programlisting><?code-font-size 75% ?>&lt;button onclick=
     "alert('&lt;%=ESAPI.encoder().encodeForJavaScript(UNTRUSTED)%&gt;');"&gt;</programlisting>
     </example>
