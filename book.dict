@@ -133,6 +133,7 @@ isValidLDAPString
 isValidLDAPSearchString
 getCustomerName
 getParameter
+param
 paramname
 queryId
 
@@ -148,6 +149,8 @@ LastName
 tableName
 TableName
 
-
 canonicalize
 canonicalization
+
+CLASSPATH
+classpaths
