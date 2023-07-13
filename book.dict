@@ -59,6 +59,7 @@ onload
 onerror
 innerHTML
 innerText
+textContent
 
 untrusted
 Untrusted
@@ -146,3 +147,7 @@ lastName
 LastName
 tableName
 TableName
+
+
+canonicalize
+canonicalization
