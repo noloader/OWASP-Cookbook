@@ -132,9 +132,10 @@
       </tgroup>
     </table>
   </section>
+  <!-- Keep this in sync with the test in ch02 -->
   <section id="xss_canonicalize">
     <title>Canonicalization</title>
-    <para><indexterm><primary>Canonicalization</primary></indexterm>Sometimes you will need to use an ESAPI control on a value, but the value may already be encoded. To avoid double encoding you can call <systemitem>canonicalize</systemitem> to normalize a value before encoding.</para>
+    <para><indexterm><primary>Canonicalization</primary></indexterm>Sometimes you will need to use an ESAPI control on a value, but the value may already be encoded. To avoid double encoding you can call <systemitem>canonicalize</systemitem> to normalize a value <emphasis>before</emphasis> input validation and encoding. Input validation is covered in <xref linkend="ch02_input_validation"/>.</para>
     <example id="xss_ex_canonicalize_esapi">
       <title>Canonicalization, ESAPI Encoder</title>
       <programlisting><?code-font-size 75% ?>String UNTRUSTED = request.getParameter("SomeParameter");
@@ -142,7 +143,6 @@ UNTRUSTED = ESAPI.encoder().canonicalize(UNTRUSTED);
 ...
 String encoded = ESAPI.encoder().encodeForURL(UNTRUSTED);</programlisting>
     </example>
-    <para>If you use <systemitem>canonicalize</systemitem>, then validate the data <emphasis>after</emphasis> canonicalization, and not before. Validation is covered in <xref linkend="ch02_input_validation"/>.</para>
     <para>If you have to call <systemitem>canonicalize</systemitem> multiple times, then it could be an attacker supplying data already encoded to evade detection. If you find you need to call <systemitem>canonicalize</systemitem>, then consider returning an error. Don't allow an attacker to have multiple attempts on your code.</para>
   </section>
   <section id="xss_html">
