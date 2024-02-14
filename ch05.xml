@@ -356,7 +356,7 @@ Laura Callahan</programlisting>
     <para>Running the program with the validator will result in an exception if an attacker attempts to use the Employee table.</para>
     <programlisting><?code-font-size 75% ?><?code-font-size 75% ?>$ java -cp "$(pwd):sqlite-jdbc-3.42.0.0.jar" DataTest Employee FirstName LastName _
 java.lang.IllegalArgumentException: Table name Employee is not valid</programlisting>
-    <para>Unfortunately, <systemitem>validateTableName</systemitem> will be an incomplete remediation because it continues to allow other restricted table names, like  Invoice and InvoiceLine. The complete solution is to statically declare the query and use a Prepared Statement or Parameterized Query to bind the user input.</para>
+    <para>Unfortunately, <systemitem>validateTableName</systemitem> will be an incomplete remediation because it continues to allow other restricted table names, like Invoice and InvoiceLine. The complete solution is to statically declare the query and use a Prepared Statement or Parameterized Query to bind the user input.</para>
     <para>A modified program is shown below, and it uses <systemitem>queryId</systemitem> and <systemitem>case</systemitem> statement to take control of the query string and leverage a Prepared Statement. The the app uses a URI similar to <systemitem>https://www.example.com/query?queryId=XU746BVVA7VXCBOZ7JZA&amp;search=Br</systemitem>. The queries are statically declared, the attacker never controls the table name or column names, and the values the attacker controls are bound in a Prepared Statement.</para>
     <example id="sql_inj_ex_dyn_query_ok">
       <title>Dynamic Query, Prepared Statement</title>
@@ -368,8 +368,15 @@ PreparedStatement statement = null;
 
 switch (queryId.toUpperCase())
 {
+    // Query Customer table
     case "XU746BVVA7VXCBOZ7JZA":
         String query = "SELECT FirstName,LastName FROM Customer WHERE LastName LIKE ?";
+        statement = connection.prepareStatement(query);
+        statement.setString(1, search+"%");
+        break;
+    // Query Employee table
+    case "36CK6UKAWRIDJOOVV3GA":
+        String query = "SELECT FirstName,LastName FROM Employee WHERE LastName LIKE ?";
         statement = connection.prepareStatement(query);
         statement.setString(1, search+"%");
         break;
